@@ -1,0 +1,32 @@
+name: Weekly BI Report
+
+on:
+  schedule:
+    - cron: "0 10 * * 1" # Cada lunes a las 10 AM
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - run: python scripts/weekly_report.py
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit report
+        run: |
+          git config --global user.name "automation-bot"
+          git config --global user.email "bot@github.com"
+          git add reports/
+          git commit -m "Update weekly report"
+          git push
