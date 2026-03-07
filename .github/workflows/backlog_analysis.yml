@@ -1,1 +1,39 @@
+name: BI Backlog Analysis
 
+on:
+  schedule:
+    - cron: "0 8 * * 1"  # Cada lunes a las 8 AM
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Get Linear Issues
+        run: python scripts/get_linear_issues.py
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
+      - name: Generate Backlog Summary
+        run: python scripts/backlog_summary.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit report
+        run: |
+          git config --global user.name "automation-bot"
+          git config --global user.email "bot@github.com"
+          git add reports/
+          git commit -m "Update backlog report"
+          git push
