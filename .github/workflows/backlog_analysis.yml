@@ -1,8 +1,6 @@
 name: BI Backlog Analysis
 
 on:
-  schedule:
-    - cron: "0 8 * * 1"  # Cada lunes a las 8 AM
   workflow_dispatch:
 
 jobs:
