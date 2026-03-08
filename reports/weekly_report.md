@@ -1,56 +1,1215 @@
-# Weekly BI Report básico
+# Weekly BI Report
 
-OpenAI no disponible. Generando reporte simple.
+- **Título:** Carga de Presupuesto/Objetivo DIGITAL
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-06
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
 
-Generated: 2026-03-08 21:27:11.269006
+- **Título:** Carga de Presupuesto/Objetivo RETAIL
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
 
-- Carga de Presupuesto/Objetivo DIGITAL (Done)
-- Carga de Presupuesto/Objetivo RETAIL (Done)
-- Cargar Presupuesto de Ventas Aristocrazy para Marzo 2026 (Done)
-- Cambio de Presupuesto en Reportes de Suarez (Backlog)
-- Ajuste en cálculo de comisión High Ticket (Suarez) (Done)
-- Cambio de cálculo de Consentimiento (Clientes Suarez) (Done)
-- Envío de tablas de Salesforce al equipo de Arbentia (Done)
-- Cambiar la ruta del Excel de Minimun Display para Producto Aristocrazy (Done)
-- Crear lógica utilizando TAG de Shopify para automatizar cálculo de variable para Pasillo Infinito (Backlog)
-- Crear Excel con análsis de Febrero (Waiting for Approval)
-- Crear Excel con análisis de pago de variable Febrero 2026 (In Progress)
-- Cambiar ruta de carpeta de imágenes para el modelo semántico de Aristocrazy (Backlog)
-- Agregar importe del pedido de venta calculado desde Shopify (In Progress)
-- Agregar contador que indique la cantidad de líneas de devolución que tiene esa venta (Done)
-- Solo mostrar documento de Devolución y última fecha (Done)
-- Pedidos de Shopify que tienen 2 nros de devolución, está generando una duplicidad de líneas (Done)
-- Ajustar tabla 'Flujo de Pedidos Digital' (In Progress)
-- Crear Rerpote/Analítica para Listar ventas por empleado con el detalle de la referencia que han comprado (Waiting for Approval)
-- Comparar con el modelo de ventas contable (Done)
-- Parece que se están duplicando el dato de venta (Done)
-- Generación de ventas Zalandoi - Aristocrazy (Done)
-- Crear Reporte de Obras Nuevas Digital Suarez (Backlog)
-- Proponer acciones correctivas (Backlog)
-- Identificar áreas baja adopción (Backlog)
-- Monitorear adopción 4 semanas (Backlog)
-- Enviar comunicación oficial (Backlog)
-- Diseñar plan comunicación lanzamiento (Backlog)
-- Configurar seguimiento de uso (Backlog)
-- Definir métricas de uso (Backlog)
-- Ajustar documentación (Backlog)
-- Recoger feedback (Backlog)
-- Realizar sesiones de formación (Backlog)
-- Agendar sesiones por área (Backlog)
-- Preparar ejemplos prácticos (Backlog)
-- Crear material formativo por dominio (Backlog)
-- Publicación oficial (Backlog)
-- Testing funcional (Backlog)
-- Aplicar permisos finales (Backlog)
-- Integrar dashboards publicados (Backlog)
-- Implementar portal (Backlog)
-- Diseñar wireframe portal (Backlog)
-- Diseñar estructura navegación (Backlog)
-- Publicación (Backlog)
-- Ajustes (Backlog)
-- Validación con Logística (Backlog)
-- Dashboard logística v1 (Backlog)
-- Medidas DAX logística (Backlog)
-- Modelo semántico logística (Backlog)
-- Pipeline logística (Backlog)
-- Definir KPIs logística (Backlog)
+- **Título:** Cargar Presupuesto de Ventas Aristocrazy para Marzo 2026
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-06
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Cambio de Presupuesto en Reportes de Suarez
+  - Estado: Backlog
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-09
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajuste en cálculo de comisión High Ticket (Suarez)
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Cambio de cálculo de Consentimiento (Clientes Suarez)
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Envío de tablas de Salesforce al equipo de Arbentia
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Cambiar la ruta del Excel de Minimun Display para Producto Aristocrazy
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear lógica utilizando TAG de Shopify para automatizar cálculo de variable para Pasillo Infinito
+  - Estado: Backlog
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-13
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear Excel con análsis de Febrero
+  - Estado: Waiting for Approval
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-06
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear Excel con análisis de pago de variable Febrero 2026
+  - Estado: In Progress
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-09
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Cambiar ruta de carpeta de imágenes para el modelo semántico de Aristocrazy
+  - Estado: Backlog
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-09
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Agregar importe del pedido de venta calculado desde Shopify
+  - Estado: In Progress
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-10
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Agregar contador que indique la cantidad de líneas de devolución que tiene esa venta
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Solo mostrar documento de Devolución y última fecha
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Pedidos de Shopify que tienen 2 nros de devolución, está generando una duplicidad de líneas
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustar tabla 'Flujo de Pedidos Digital'
+  - Estado: In Progress
+  - Asignado a: gerardoalbornozd
+  - Due Date: 2026-03-10
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear Rerpote/Analítica para Listar ventas por empleado con el detalle de la referencia que han comprado
+  - Estado: Waiting for Approval
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Comparar con el modelo de ventas contable
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Parece que se están duplicando el dato de venta
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Generación de ventas Zalandoi - Aristocrazy
+  - Estado: Done
+  - Asignado a: gerardoalbornozd
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear Reporte de Obras Nuevas Digital Suarez
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: 2026-03-11
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Proponer acciones correctivas
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Identificar áreas baja adopción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Monitorear adopción 4 semanas
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Enviar comunicación oficial
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar plan comunicación lanzamiento
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Configurar seguimiento de uso
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Definir métricas de uso
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustar documentación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Recoger feedback
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Realizar sesiones de formación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Agendar sesiones por área
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Preparar ejemplos prácticos
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear material formativo por dominio
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación oficial
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Testing funcional
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Aplicar permisos finales
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Integrar dashboards publicados
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Implementar portal
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar wireframe portal
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar estructura navegación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con Logística
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Dashboard logística v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Medidas DAX logística
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Modelo semántico logística
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Pipeline logística
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Definir KPIs logística
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con PostVenta
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Dashboard postventa v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Medidas DAX postventa
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Modelo semántico postventa
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Pipeline postventa
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Definir KPIs postventa
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con Producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Dashboard producción v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Medidas DAX producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Modelo semántico producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Construcción pipelines producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Definición KPIs producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Comprensión proceso productivo
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con RRHH
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Testing técnico
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar dashboard RRHH v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear medidas DAX RRHH
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear modelo semántico RRHH
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Construir pipeline RRHH
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Definir KPIs RRHH (FTE, rotación, absentismo, etc)
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación en Producción
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes post-validación
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con Finanzas
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Testing técnico interno
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Implementar RLS específico
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar dashboard financiero v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear medidas DAX financieras
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear modelo semántico financiero
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Construir pipelines en Fabric
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar arquitectura datos financiera
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Documentar KPIs financieros acordados
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Reunión comprensión proceso financiero
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicación final
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Ajustes
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Validación con Comercial
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Testing técnico
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Diseñar dashboards/Reports comercial v1
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear medidas DAX ventas, margen, etc
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Crear modelo semántico comercial
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Construir pipelines comerciales
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Documentar métricas acordadas
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Reunión definición KPIs comerciales
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+- **Título:** Publicar guía oficial en Notion
+  - Estado: Backlog
+  - Asignado a: Sin asignar
+  - Due Date: None
+  - Departamento: -
+  - Esfuerzo Estimado: -
+  - Impacto en Negocio: -
+  - Prioridad: -
+  - Sociedad: -
+  - Tipo de Proyecto: -
+  - Tipo de Trabajo: -
+
+
+
+# Nota: OpenAI falló, se generó reporte estándar.
+Error: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+
