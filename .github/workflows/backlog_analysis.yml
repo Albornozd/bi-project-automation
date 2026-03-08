@@ -1,48 +1,44 @@
-import requests
-import os
-import json
+name: BI Backlog Analysis
 
-token = os.environ.get("LINEAR_API_KEY")
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"
 
-headers = {
-    "Authorization": token,
-    "Content-Type": "application/json"
-}
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
 
-query = """
-{
-  issues(first: 10) {
-    nodes {
-      id
-      title
-      state {
-        name
-      }
-    }
-  }
-}
-"""
+    steps:
 
-response = requests.post(
-    "https://api.linear.app/graphql",
-    json={"query": query},
-    headers=headers
-)
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-data = response.json()
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-# imprimir respuesta completa para debug
-print(json.dumps(data, indent=2))
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-# verificar errores
-if "errors" in data:
-    print("Error en la query GraphQL")
-    exit(1)
+      - name: Get Linear Issues
+        run: python scripts/get_linear_issues.py
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-# verificar estructura
-issues = data.get("data", {}).get("issues", {}).get("nodes", [])
+      - name: Analyze Backlog
+        run: python scripts/analyze_backlog.py
 
-print(f"Issues encontrados: {len(issues)}")
+      - name: Generate Report
+        run: python scripts/generate_report.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-for issue in issues:
-    print(f"- {issue['title']} ({issue['state']['name']})")
+      - name: Commit report
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add reports/
+          git commit -m "update backlog report" || echo "no changes"
+          git push
