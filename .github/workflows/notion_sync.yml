@@ -2,7 +2,7 @@ name: Notion to Linear Sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Cada 6 horas
+    - cron: "0 */6 * * *" # Cada 6 horas
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,8 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python scripts/notion_to_linear.py
+      - name: Notion -> Linear
+        run: python scripts/notion_to_linear.py
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
