@@ -1,13 +1,14 @@
-name: Linear Sync
+name: Notion to Linear Sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Cada 6 horas
+    - cron: "0 */6 * * *"  # Cada 6 horas
   workflow_dispatch:
 
 jobs:
-  fetch_issues:
+  sync:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -17,12 +18,7 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python scripts/get_linear_issues.py
+      - run: python scripts/notion_to_linear.py
         env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      - name: Upload Linear Issues
-        uses: actions/upload-artifact@v4
-        with:
-          name: linear_issues
-          path: data/linear_issues.json
