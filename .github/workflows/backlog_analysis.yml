@@ -1,16 +1,48 @@
-name: Test Workflow
+import requests
+import os
+import json
 
-on:
-  workflow_dispatch:
+token = os.environ.get("LINEAR_API_KEY")
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+headers = {
+    "Authorization": token,
+    "Content-Type": "application/json"
+}
 
-    steps:
-      - uses: actions/checkout@v3
+query = """
+{
+  issues(first: 10) {
+    nodes {
+      id
+      title
+      state {
+        name
+      }
+    }
+  }
+}
+"""
 
-      - name: Test Linear API
-        run: python scripts/test_linear.py
-        env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+response = requests.post(
+    "https://api.linear.app/graphql",
+    json={"query": query},
+    headers=headers
+)
+
+data = response.json()
+
+# imprimir respuesta completa para debug
+print(json.dumps(data, indent=2))
+
+# verificar errores
+if "errors" in data:
+    print("Error en la query GraphQL")
+    exit(1)
+
+# verificar estructura
+issues = data.get("data", {}).get("issues", {}).get("nodes", [])
+
+print(f"Issues encontrados: {len(issues)}")
+
+for issue in issues:
+    print(f"- {issue['title']} ({issue['state']['name']})")
