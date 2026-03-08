@@ -23,16 +23,25 @@ try:
     )
     report_text = response.choices[0].message.content
 
-except Exception as e:
+except Exception:
     # Fallback: reporte estándar si OpenAI falla
     report_text = "Backlog / BI Report\nNota: OpenAI falló, reporte estándar.\n\n"
     for i in issues:
-        report_text += (
-            f"- [{i.get('team', 'Sin Team')}/{i.get('project', 'Sin Project')}] "
-            f"{i.get('name')} | Status: {i.get('status')} | Due: {i.get('dueDate', 'Sin fecha')} | "
-            f"Assignee: {i.get('assignee', {}).get('name', 'Sin asignar')} | "
-            f"Labels: {', '.join([l['name'] for l in i.get('labels', [])])}\n"
-        )
+        assignee_name = i.get("assignee")
+        if isinstance(assignee_name, dict):
+            assignee_name = assignee_name.get("name", "Sin asignar")
+        elif isinstance(assignee_name, str):
+            assignee_name = assignee_name
+        else:
+            assignee_name = "Sin asignar"
+
+        team = i.get("team", "Sin Team")
+        project = i.get("project", "Sin Project")
+        status = i.get("status", "Sin status")
+        due = i.get("dueDate", "Sin fecha")
+        labels = ", ".join([l["name"] for l in i.get("labels", [])]) if i.get("labels") else "Sin labels"
+
+        report_text += f"- [{team}/{project}] {i.get('name')} | Status: {status} | Due: {due} | Assignee: {assignee_name} | Labels: {labels}\n"
 
 os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
