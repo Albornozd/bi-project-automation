@@ -2,11 +2,11 @@ name: Backlog Report
 
 on:
   schedule:
-    - cron: "0 8 * * 1" # Cada lunes a las 8 AM
+    - cron: "0 8 * * 1" # Lunes 8AM
   workflow_dispatch:
 
 jobs:
-  backlog_report:
+  report:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,24 +17,17 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # Obtener issues de Linear
-      - run: python scripts/get_linear_issues.py
-        env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      # Ejecutar backlog report
       - run: python scripts/generate_report.py
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/backlog_report.md
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # Commit y push
-      - name: Commit backlog report
+      - name: Commit report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
-          git commit -m "Update backlog report" || echo "no changes"
-          git push
+          git commit -m "Update backlog report" || echo "No changes to commit"
+          git push || echo "Push failed, possibly due to permissions"
