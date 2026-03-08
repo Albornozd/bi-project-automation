@@ -10,22 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clonar repositorio
       - uses: actions/checkout@v3
 
-      # 2️⃣ Configurar Python
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3️⃣ Instalar dependencias
       - run: pip install -r requirements.txt
 
-      # 4️⃣ Crear carpeta de reportes
       - name: Crear carpeta reports
         run: mkdir -p reports
 
-      # 5️⃣ Ejecutar script de generación de roadmap
       - name: Generar Roadmap
         run: python scripts/roadmap_generator.py
         env:
@@ -33,7 +28,6 @@ jobs:
           INPUT_FILE: "data/linear_issues.json"
           OUTPUT_FILE: "reports/roadmap.md"
 
-      # 6️⃣ Commit y push del reporte
       - name: Commit roadmap
         run: |
           git config --global user.name "automation-bot"
