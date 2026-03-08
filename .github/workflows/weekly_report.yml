@@ -2,7 +2,7 @@ name: Weekly BI Report
 
 on:
   schedule:
-    - cron: "0 10 * * 1"  # Cada lunes 10 AM
+    - cron: "0 10 * * 1" # Cada lunes a las 10 AM
   workflow_dispatch:
 
 jobs:
@@ -18,17 +18,20 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Generar weekly report
+      - name: Crear carpeta reports
+        run: mkdir -p reports
+
+      - name: Generar Weekly Report
         run: python scripts/weekly_report.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INPUT_FILE: "data/linear_issues.json"
           OUTPUT_FILE: "reports/weekly_report.md"
 
-      - name: Commit report
+      - name: Commit weekly report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
-          git add reports/
+          git add reports/weekly_report.md
           git commit -m "Update weekly report" || echo "No changes to commit"
           git push
