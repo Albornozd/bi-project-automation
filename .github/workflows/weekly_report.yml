@@ -2,7 +2,7 @@ name: Weekly BI Report
 
 on:
   schedule:
-    - cron: "0 10 * * 1" # Lunes 10 AM
+    - cron: "0 10 * * 1" # Cada lunes 10 AM
   workflow_dispatch:
 
 jobs:
@@ -10,17 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+
       - run: pip install -r requirements.txt
+
+      - name: Download Linear Issues
+        uses: actions/download-artifact@v3
+        with:
+          name: linear_issues
+          path: data
+
       - run: python scripts/weekly_report.py
         env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/weekly_report.md
-      - name: Commit report
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit weekly report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
