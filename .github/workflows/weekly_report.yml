@@ -2,11 +2,11 @@ name: Weekly BI Report
 
 on:
   schedule:
-    - cron: "0 10 * * 1" # Cada lunes a las 10 AM
+    - cron: "0 10 * * 1" # Lunes 10AM
   workflow_dispatch:
 
 jobs:
-  weekly_report:
+  report:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,24 +17,17 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # Obtener issues de Linear
-      - run: python scripts/get_linear_issues.py
-        env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      # Ejecutar weekly report
       - run: python scripts/weekly_report.py
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/weekly_report.md
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # Commit y push
-      - name: Commit weekly report
+      - name: Commit report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
-          git commit -m "Update weekly report" || echo "no changes"
-          git push
+          git commit -m "Update weekly report" || echo "No changes to commit"
+          git push || echo "Push failed, possibly due to permissions"
