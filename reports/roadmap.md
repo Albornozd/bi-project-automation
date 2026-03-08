@@ -1,2 +1,2 @@
-# Roadmap BI
-Nota: OpenAI falló, reporte estándar.
+# Roadmap BI - Reporte Estándar
+
