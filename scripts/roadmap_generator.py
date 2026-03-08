@@ -1,38 +1,42 @@
 import json
 import os
+from datetime import datetime
 from openai import OpenAI
 
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+INPUT_FILE = os.environ.get("INPUT_FILE", "data/linear_issues.json")
+OUTPUT_FILE = os.environ.get("OUTPUT_FILE", "reports/roadmap.md")
 
-with open("data/linear_issues.json") as f:
+# cargar issues de Linear
+with open(INPUT_FILE) as f:
     data = json.load(f)
 
-issues = data["data"]["issues"]["nodes"]
+issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 
-text = ""
-for i in issues:
-    text += f"""
-Title: {i['title']}
-Due: {i['dueDate']}
-Priority: {i['priority']}
-Status: {i['state']['name']}
-Labels: {', '.join([l['name'] for l in i['labels']]) if i['labels'] else 'None'}
-"""
+# preparar texto para AI
+issues_text = "\n".join([f"- {i['title']} ({i['state']['name']})" for i in issues])
 
-prompt = f"""
-Genera un roadmap visual y organizado de proyectos BI basado en el siguiente backlog:
+prompt = f"Genera un roadmap de BI usando estos tickets:\n{issues_text}"
 
-{text}
-"""
+report = ""
 
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role":"user","content":prompt}]
-)
+try:
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role":"user","content":prompt}]
+    )
+    report = response.choices[0].message.content
 
-roadmap = response.choices[0].message.content
+except Exception as e:
+    report = "# Roadmap básico\n\n"
+    report += "OpenAI no disponible. Generando roadmap simple.\n\n"
+    report += f"Generated: {datetime.now()}\n\n"
+    for i in issues:
+        report += f"- {i['title']} ({i['state']['name']})\n"
 
-with open("reports/roadmap.md","w") as f:
-    f.write(roadmap)
+# guardar resultado
+os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+with open(OUTPUT_FILE, "w") as f:
+    f.write(report)
 
-print("✅ Roadmap generado")
+print("Roadmap generado:", OUTPUT_FILE)
