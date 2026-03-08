@@ -1,4 +1,4 @@
-name: Linear Sync
+ name: Linear Sync
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  fetch_issues:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,11 +17,14 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python scripts/get_linear_issues.py
+      - name: Fetch Linear issues
+        run: |
+          mkdir -p data
+          python scripts/linear_fetch.py --output data/linear_issues.json
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-      - name: Upload Linear Issues
+      - name: Upload JSON artifact
         uses: actions/upload-artifact@v4
         with:
           name: linear_issues
