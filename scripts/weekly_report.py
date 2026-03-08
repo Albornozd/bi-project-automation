@@ -1,42 +1,42 @@
 import json
 import os
+from datetime import datetime
 from openai import OpenAI
-import datetime
 
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+INPUT_FILE = os.environ.get("INPUT_FILE", "data/linear_issues.json")
+OUTPUT_FILE = os.environ.get("OUTPUT_FILE", "reports/weekly_report.md")
 
-with open("data/linear_issues.json") as f:
+# cargar issues de Linear
+with open(INPUT_FILE) as f:
     data = json.load(f)
 
-issues = data["data"]["issues"]["nodes"]
+issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 
-# Filtrar por semana actual
-today = datetime.date.today()
-start_week = today - datetime.timedelta(days=today.weekday())  # lunes
-end_week = start_week + datetime.timedelta(days=6)
+# preparar texto para AI
+issues_text = "\n".join([f"- {i['title']} ({i['state']['name']})" for i in issues])
 
-text = ""
-for i in issues:
-    due = i['dueDate']
-    if due:
-        due_date = datetime.date.fromisoformat(due[:10])
-        if start_week <= due_date <= end_week:
-            text += f"{i['title']} - Due: {due_date} - Status: {i['state']['name']}\n"
+prompt = f"Genera un reporte semanal de BI usando estos tickets:\n{issues_text}"
 
-prompt = f"""
-Genera un reporte semanal de avances de proyectos BI para esta semana:
+report = ""
 
-{text}
-"""
+try:
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role":"user","content":prompt}]
+    )
+    report = response.choices[0].message.content
 
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role":"user","content":prompt}]
-)
+except Exception as e:
+    report = "# Weekly BI Report básico\n\n"
+    report += "OpenAI no disponible. Generando reporte simple.\n\n"
+    report += f"Generated: {datetime.now()}\n\n"
+    for i in issues:
+        report += f"- {i['title']} ({i['state']['name']})\n"
 
-summary = response.choices[0].message.content
+# guardar resultado
+os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+with open(OUTPUT_FILE, "w") as f:
+    f.write(report)
 
-with open("reports/weekly_report.md","w") as f:
-    f.write(summary)
-
-print("✅ Reporte semanal generado")
+print("Weekly report generado:", OUTPUT_FILE)
