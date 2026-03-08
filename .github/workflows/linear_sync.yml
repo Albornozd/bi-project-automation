@@ -2,32 +2,26 @@ name: Linear Sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Cada 6 horas
+    - cron: "0 */6 * * *"  # Cada 6 horas
   workflow_dispatch:
 
 jobs:
-  fetch:
+  fetch-linear:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      
+
       - run: pip install -r requirements.txt
 
-      - name: Fetch Linear issues
-        run: |
-          mkdir -p data
-          python scripts/linear_fetch.py --output data/linear_issues.json
+      - name: Crear carpeta de datos
+        run: mkdir -p data
+
+      - name: Traer issues de Linear
+        run: python scripts/linear_fetch.py
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      - name: Commit JSON
-        run: |
-          git config --global user.name "automation-bot"
-          git config --global user.email "bot@github.com"
-          git add data/linear_issues.json
-          git commit -m "Update linear_issues.json" || echo "No changes to commit"
-          git push || echo "Push failed"
