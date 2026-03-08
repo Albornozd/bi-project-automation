@@ -10,5 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Test step
-        run: echo "GitHub Actions funciona correctamente"
+      - name: Test Linear API
+        run: python scripts/test_linear.py
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
