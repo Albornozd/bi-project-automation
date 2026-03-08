@@ -1,53 +1,50 @@
-import json
 import os
+import json
+from datetime import datetime
 from openai import OpenAI
 
-# cargar datos de Linear
-with open("data/linear_issues.json") as f:
+INPUT_FILE = os.environ.get("INPUT_FILE", "data/linear_issues.json")
+OUTPUT_FILE = os.environ.get("OUTPUT_FILE", "reports/backlog_report.md")
+
+# Cargar issues de Linear
+with open(INPUT_FILE) as f:
     data = json.load(f)
 
-issues = data["data"]["issues"]["nodes"]
+issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 
-# preparar texto para OpenAI
-issues_text = "\n".join([f"- {issue['title']} ({issue['state']['name']})" for issue in issues])
+report_text = ""
 
-prompt = f"""
-Analiza el siguiente backlog de BI y genera un resumen ejecutivo:
+for i in issues:
+    labels_dict = {}
+    for lbl in i.get("labels", {}).get("nodes", []):
+        cat = lbl.get("description", "Otros")
+        labels_dict[cat] = lbl.get("name")
+    
+    report_text += f"- **Título:** {i.get('title')}\n"
+    report_text += f"  - Estado: {i.get('state', {}).get('name')}\n"
+    report_text += f"  - Asignado a: {i.get('assignee', {}).get('name', 'Sin asignar')}\n"
+    report_text += f"  - Due Date: {i.get('dueDate', 'Sin fecha')}\n"
+    for cat in ["Departamento","Esfuerzo Estimado","Impacto en Negocio","Prioridad","Sociedad","Tipo de Proyecto","Tipo de Trabajo"]:
+        report_text += f"  - {cat}: {labels_dict.get(cat, '-')}\n"
+    report_text += "\n"
 
-{issues_text}
-"""
-
+# Generación con OpenAI (fallback automático)
 report = ""
-
 try:
-    print("Intentando generar reporte con OpenAI...")
-
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
+    prompt = f"Genera un reporte de BI detallado usando estos issues:\n{report_text}"
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=[{"role":"user","content":prompt}]
     )
-
     report = response.choices[0].message.content
-    print("Reporte generado con OpenAI")
+except Exception:
+    report = "# Reporte BI básico\n\n" + report_text
+    report += f"\nGenerado: {datetime.now()} (fallback automático)\n"
 
-except Exception as e:
-
-    print("OpenAI no disponible. Generando reporte básico.")
-    print("Error:", e)
-
-    # generar reporte básico
-    report = "# Backlog Report\n\n"
-    report += "OpenAI no disponible. Reporte generado automáticamente.\n\n"
-
-    for issue in issues:
-        report += f"- {issue['title']} ({issue['state']['name']})\n"
-
-# guardar reporte
-with open("reports/backlog_report.md", "w") as f:
+# Guardar reporte
+os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+with open(OUTPUT_FILE, "w") as f:
     f.write(report)
 
-print("Reporte guardado en reports/backlog_report.md")
+print("Reporte generado:", OUTPUT_FILE)
