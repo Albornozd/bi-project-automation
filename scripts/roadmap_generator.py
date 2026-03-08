@@ -1,9 +1,7 @@
 import os
 import json
 from pathlib import Path
-
-# OpenAI nuevo cliente
-from openai import OpenAI, error
+import openai
 
 INPUT_FILE = os.getenv("INPUT_FILE", "data/linear_issues.json")
 OUTPUT_FILE = os.getenv("OUTPUT_FILE", "reports/roadmap.md")
@@ -26,7 +24,6 @@ def generar_reporte_estandar(issues):
         report += f"  - Estado: {i.get('status', 'Sin estado')}\n"
         report += f"  - Due Date: {i.get('due_date', 'No asignado')}\n"
         report += f"  - Asignado a: {i.get('assignee', 'Sin asignar')}\n"
-        # Labels
         labels = i.get("labels", {})
         for label_group in ["Departamento", "Impacto en Negocio", "Esfuerzo Estimado", "Prioridad", "Sociedad", "Tipo de Proyecto", "Tipo de Trabajo"]:
             value = labels.get(label_group, "No definido")
@@ -35,8 +32,9 @@ def generar_reporte_estandar(issues):
     return report
 
 # Intentar generar con OpenAI
+report_text = ""
 try:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     prompt = (
         "Genera un roadmap BI en formato Markdown basado en los siguientes issues:\n\n"
         f"{json.dumps(issues, indent=2)}\n\n"
@@ -49,8 +47,11 @@ try:
         temperature=0
     )
     report_text = response.choices[0].message.content
-except (error.OpenAIError, Exception) as e:
+except openai.OpenAIError as e:
     print(f"OpenAI falló, generando reporte estándar. Error: {e}")
+    report_text = generar_reporte_estandar(issues)
+except Exception as e:
+    print(f"Ocurrió un error inesperado con OpenAI: {e}")
     report_text = generar_reporte_estandar(issues)
 
 # Guardar reporte
