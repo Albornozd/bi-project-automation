@@ -1,47 +1,52 @@
 import os
 import json
-from openai import OpenAI, error
+from pathlib import Path
+import openai
 
 INPUT_FILE = os.getenv("INPUT_FILE", "data/linear_issues.json")
-OUTPUT_FILE = os.getenv("OUTPUT_FILE", "reports/backlog_report.md")
+OUTPUT_FILE = os.getenv("OUTPUT_FILE", "reports/roadmap.md")
 
-# Leer issues de Linear
+Path("reports").mkdir(parents=True, exist_ok=True)
+
 try:
     with open(INPUT_FILE, encoding="utf-8") as f:
-        data = json.load(f)
-    issues = data.get("issues", [])
-except Exception as e:
-    print(f"Error leyendo {INPUT_FILE}: {e}")
+        issues = json.load(f)
+except FileNotFoundError:
+    print(f"Error: {INPUT_FILE} no encontrado")
     issues = []
 
-# Preparar texto para OpenAI
-prompt = "Genera un reporte detallado del backlog de BI basado en estos issues:\n"
-prompt += json.dumps(issues, indent=2)
+def generar_reporte_estandar(issues):
+    report = "# Roadmap BI - Reporte Estándar\n\n"
+    for i in issues:
+        report += f"- **[{i.get('team','Sin Team')}/{i.get('project','Sin Project')}] {i.get('name','Sin nombre')}**\n"
+        report += f"  - Estado: {i.get('status','Sin estado')}\n"
+        report += f"  - Due Date: {i.get('due_date','No asignado')}\n"
+        report += f"  - Asignado a: {i.get('assignee','Sin asignar')}\n"
+        labels = i.get("labels", {})
+        for label_group in ["Departamento", "Impacto en Negocio", "Esfuerzo Estimado", "Prioridad", "Sociedad", "Tipo de Proyecto", "Tipo de Trabajo"]:
+            value = labels.get(label_group, "No definido")
+            report += f"  - {label_group}: {value}\n"
+        report += "\n"
+    return report
 
-report_text = "# Backlog / BI Report\n\n"
-
+report_text = ""
 try:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    prompt = f"Genera un roadmap BI en Markdown basado en los siguientes issues:\n{json.dumps(issues, indent=2)}"
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.5
+        messages=[{"role":"user","content":prompt}],
+        temperature=0
     )
-    report_text += response.choices[0].message.content
+    report_text = response.choices[0].message.content
+except openai.OpenAIError as e:
+    print(f"OpenAI falló, generando reporte estándar. Error: {e}")
+    report_text = generar_reporte_estandar(issues)
 except Exception as e:
-    print(f"OpenAI falló: {e}")
-    # Fallback: reporte estándar
-    if not issues:
-        report_text += "No se encontraron issues para mostrar.\n"
-    else:
-        for i in issues:
-            report_text += f"- [{i.get('team', 'Sin Team')}/{i.get('project', 'Sin Project')}] {i.get('title', 'Sin título')} | "
-            report_text += f"Estado: {i.get('status', 'Sin estado')} | Due Date: {i.get('dueDate', 'No asignado')} | "
-            report_text += f"Labels: {', '.join([l['name'] for l in i.get('labels', [])])}\n"
+    print(f"Error inesperado: {e}")
+    report_text = generar_reporte_estandar(issues)
 
-# Guardar reporte
-os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     f.write(report_text)
 
-print(f"Reporte generado en {OUTPUT_FILE}")
+print(f"Reporte guardado en {OUTPUT_FILE}")
