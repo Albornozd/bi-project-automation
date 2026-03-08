@@ -2,39 +2,33 @@ name: Roadmap Generator
 
 on:
   schedule:
-    - cron: "0 12 * * 1" # Lunes 12PM
+    - cron: "0 12 * * 1" # Cada lunes 12 PM
   workflow_dispatch:
 
 jobs:
   roadmap:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      
+
       - run: pip install -r requirements.txt
 
-      - name: Fetch Linear issues
-        run: |
-          mkdir -p data
-          python scripts/linear_fetch.py --output data/linear_issues.json
-        env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      - name: Generate Roadmap
+      - name: Generar roadmap
         run: python scripts/roadmap_generator.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          INPUT_FILE: data/linear_issues.json
-          OUTPUT_FILE: reports/roadmap.md
+          INPUT_FILE: "data/linear_issues.json"
+          OUTPUT_FILE: "reports/roadmap.md"
 
-      - name: Commit Roadmap
+      - name: Commit roadmap
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
           git commit -m "Update roadmap" || echo "No changes to commit"
-          git push || echo "Push failed"
+          git push
