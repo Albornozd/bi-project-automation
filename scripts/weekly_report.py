@@ -1,18 +1,19 @@
 import os
 import json
-from datetime import datetime
-from openai import OpenAI
+import openai
 
 INPUT_FILE = os.environ.get("INPUT_FILE", "data/linear_issues.json")
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE", "reports/weekly_report.md")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-# Cargar issues de Linear
-with open(INPUT_FILE) as f:
+os.makedirs("reports", exist_ok=True)
+
+with open(INPUT_FILE, encoding="utf-8") as f:
     data = json.load(f)
 
 issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 
-report_text = ""
+report_text = "# Weekly BI Report\n\n"
 
 for i in issues:
     labels_dict = {}
@@ -20,31 +21,37 @@ for i in issues:
         cat = lbl.get("description", "Otros")
         labels_dict[cat] = lbl.get("name")
     
+    assignee = i.get("assignee")
+    assignee_name = assignee.get("name") if assignee else "Sin asignar"
+    state_name = i.get("state", {}).get("name", "-")
+    due_date = i.get("dueDate", "Sin fecha")
+    
     report_text += f"- **Título:** {i.get('title')}\n"
-    report_text += f"  - Estado: {i.get('state', {}).get('name')}\n"
-    report_text += f"  - Asignado a: {i.get('assignee', {}).get('name', 'Sin asignar')}\n"
-    report_text += f"  - Due Date: {i.get('dueDate', 'Sin fecha')}\n"
+    report_text += f"  - Estado: {state_name}\n"
+    report_text += f"  - Asignado a: {assignee_name}\n"
+    report_text += f"  - Due Date: {due_date}\n"
+    
     for cat in ["Departamento","Esfuerzo Estimado","Impacto en Negocio","Prioridad","Sociedad","Tipo de Proyecto","Tipo de Trabajo"]:
         report_text += f"  - {cat}: {labels_dict.get(cat, '-')}\n"
     report_text += "\n"
 
-# Generación con OpenAI (fallback automático)
-report = ""
+# Generación con OpenAI
 try:
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-    prompt = f"Genera un reporte semanal de BI usando estos issues:\n{report_text}"
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role":"user","content":prompt}]
+    openai.api_key = OPENAI_API_KEY
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "Eres un asistente que resume reportes BI."},
+            {"role": "user", "content": report_text}
+        ],
+        max_tokens=1000
     )
-    report = response.choices[0].message.content
-except Exception:
-    report = "# Weekly BI Report básico\n\n" + report_text
-    report += f"\nGenerado: {datetime.now()} (fallback automático)\n"
+    report_text_ai = response.choices[0].message.content
+    report_text += "\n\n# Resumen generado por AI\n\n" + report_text_ai
+except Exception as e:
+    report_text += f"\n\n# Nota: OpenAI falló, se generó reporte estándar.\nError: {str(e)}\n"
 
-# Guardar reporte
-os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-with open(OUTPUT_FILE, "w") as f:
-    f.write(report)
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    f.write(report_text)
 
-print("Weekly report generado:", OUTPUT_FILE)
+print(f"Weekly report generated: {OUTPUT_FILE}")
