@@ -5,28 +5,44 @@ on:
     - cron: "0 12 * * 1" # Cada lunes a las 12 PM
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   roadmap:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - run: python scripts/roadmap_generator.py
+      # <-- Nuevo paso: traer datos de Linear
+      - name: Get Linear Issues
+        run: python scripts/get_linear_issues.py
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      - name: Commit roadmap
+      - name: Generate Roadmap
+        run: python scripts/roadmap_generator.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          INPUT_FILE: data/linear_issues.json
+          OUTPUT_FILE: reports/roadmap.md
+        continue-on-error: true  # Fallback si OpenAI falla
+
+      - name: Commit Roadmap
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
-          git commit -m "Update roadmap"
+          git commit -m "Update roadmap" || echo "no changes"
           git push
