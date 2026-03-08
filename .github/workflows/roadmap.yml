@@ -2,7 +2,7 @@ name: Roadmap Generator
 
 on:
   schedule:
-    - cron: "0 12 * * 1" # Cada lunes 12 PM
+    - cron: "0 12 * * 1" # Cada lunes a las 12 PM
   workflow_dispatch:
 
 jobs:
@@ -10,25 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Clonar repositorio
       - uses: actions/checkout@v3
 
+      # 2️⃣ Configurar Python
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
+      # 3️⃣ Instalar dependencias
       - run: pip install -r requirements.txt
 
-      - name: Generar roadmap
+      # 4️⃣ Crear carpeta de reportes
+      - name: Crear carpeta reports
+        run: mkdir -p reports
+
+      # 5️⃣ Ejecutar script de generación de roadmap
+      - name: Generar Roadmap
         run: python scripts/roadmap_generator.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INPUT_FILE: "data/linear_issues.json"
           OUTPUT_FILE: "reports/roadmap.md"
 
+      # 6️⃣ Commit y push del reporte
       - name: Commit roadmap
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
-          git add reports/
+          git add reports/roadmap.md
           git commit -m "Update roadmap" || echo "No changes to commit"
           git push
