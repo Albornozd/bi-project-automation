@@ -2,41 +2,32 @@ name: Roadmap Generator
 
 on:
   schedule:
-    - cron: "0 12 * * 1" # Cada lunes a las 12 PM
+    - cron: "0 12 * * 1" # Lunes 12PM
   workflow_dispatch:
 
 jobs:
-  generate_roadmap:
+  roadmap:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Checkout
       - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Python
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3️⃣ Install dependencies
       - run: pip install -r requirements.txt
 
-      # 4️⃣ Obtener issues de Linear
-      - run: python scripts/get_linear_issues.py
-        env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      # 5️⃣ Ejecutar roadmap generator
       - run: python scripts/roadmap_generator.py
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/roadmap.md
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-      # 6️⃣ Commit y push
       - name: Commit roadmap
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
-          git commit -m "Update roadmap" || echo "no changes"
-          git push
+          git commit -m "Update roadmap" || echo "No changes to commit"
+          git push || echo "Push failed, possibly due to permissions"
