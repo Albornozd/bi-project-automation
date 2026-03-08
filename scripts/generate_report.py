@@ -39,7 +39,8 @@ except Exception:
         project = i.get("project", "Sin Project")
         status = i.get("status", "Sin status")
         due = i.get("dueDate", "Sin fecha")
-        labels = ", ".join([l["name"] for l in i.get("labels", [])]) if i.get("labels") else "Sin labels"
+        labels_list = i.get("labels") or []
+        labels = ", ".join([l["name"] for l in labels_list]) if labels_list else "Sin labels"
 
         report_text += f"- [{team}/{project}] {i.get('name')} | Status: {status} | Due: {due} | Assignee: {assignee_name} | Labels: {labels}\n"
 
