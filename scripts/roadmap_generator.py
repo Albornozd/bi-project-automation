@@ -1,62 +1,60 @@
 import os
 import json
-from openai import OpenAI, OpenAIError
+from pathlib import Path
+
+# OpenAI nuevo cliente
+from openai import OpenAI, error
 
 INPUT_FILE = os.getenv("INPUT_FILE", "data/linear_issues.json")
 OUTPUT_FILE = os.getenv("OUTPUT_FILE", "reports/roadmap.md")
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 
-# Cargar issues
+Path("reports").mkdir(parents=True, exist_ok=True)
+
+# Leer issues de Linear
 try:
     with open(INPUT_FILE, encoding="utf-8") as f:
         issues = json.load(f)
 except FileNotFoundError:
+    print(f"Error: no se encontró {INPUT_FILE}")
     issues = []
-    print(f"Archivo {INPUT_FILE} no encontrado. Generando reporte vacío.")
 
-report_lines = ["# Roadmap BI\n"]
-report_lines.append("Nota: OpenAI falló, reporte estándar.\n")
+# Función para generar reporte estándar
+def generar_reporte_estandar(issues):
+    report = "# Roadmap BI - Reporte Estándar\n\n"
+    for i in issues:
+        report += f"- **[{i.get('team', 'Sin Team')}/{i.get('project', 'Sin Project')}] {i.get('name', 'Sin nombre')}**\n"
+        report += f"  - Estado: {i.get('status', 'Sin estado')}\n"
+        report += f"  - Due Date: {i.get('due_date', 'No asignado')}\n"
+        report += f"  - Asignado a: {i.get('assignee', 'Sin asignar')}\n"
+        # Labels
+        labels = i.get("labels", {})
+        for label_group in ["Departamento", "Impacto en Negocio", "Esfuerzo Estimado", "Prioridad", "Sociedad", "Tipo de Proyecto", "Tipo de Trabajo"]:
+            value = labels.get(label_group, "No definido")
+            report += f"  - {label_group}: {value}\n"
+        report += "\n"
+    return report
 
-for i in issues:
-    assignee = i.get("assignee")
-    assignee_name = assignee.get("name") if isinstance(assignee, dict) else assignee or "Sin asignar"
-    
-    team = i.get("team")
-    team_name = team.get("name") if isinstance(team, dict) else team or "Sin Team"
-    
-    project = i.get("project")
-    project_name = project.get("name") if isinstance(project, dict) else project or "Sin Project"
-    
-    state = i.get("state")
-    state_name = state.get("name") if isinstance(state, dict) else state or "Sin Estado"
-    
-    due_date = i.get("due_date", "Sin Due Date")
-    labels = i.get("labels", [])
-    labels_str = ", ".join(labels)
-    
-    report_lines.append(
-        f"- [{team_name}/{project_name}] {i.get('title', 'Sin título')} | "
-        f"Asignado a: {assignee_name} | Estado: {state_name} | Due Date: {due_date} | Labels: {labels_str}\n"
+# Intentar generar con OpenAI
+try:
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    prompt = (
+        "Genera un roadmap BI en formato Markdown basado en los siguientes issues:\n\n"
+        f"{json.dumps(issues, indent=2)}\n\n"
+        "Incluye: nombre, estado, due date, assignee, proyecto, team, y labels. "
+        "Si algún campo no existe, indícalo como 'No definido'."
     )
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+    report_text = response.choices[0].message.content
+except (error.OpenAIError, Exception) as e:
+    print(f"OpenAI falló, generando reporte estándar. Error: {e}")
+    report_text = generar_reporte_estandar(issues)
 
-report_text = "".join(report_lines)
-
-# Intentar generar resumen con OpenAI
-if OPENAI_KEY:
-    try:
-        client = OpenAI(api_key=OPENAI_KEY)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres un asistente que genera roadmap de BI."},
-                {"role": "user", "content": report_text}
-            ],
-            temperature=0.5
-        )
-        report_text = response.choices[0].message.content
-    except OpenAIError as e:
-        print(f"OpenAI falló: {e}. Se mantendrá reporte estándar.")
-
-os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+# Guardar reporte
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     f.write(report_text)
+
+print(f"Reporte generado en {OUTPUT_FILE}")
