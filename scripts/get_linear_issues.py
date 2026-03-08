@@ -23,6 +23,12 @@ query = """
       assignee {
         name
       }
+      project {
+        name
+        team {
+          name
+        }
+      }
       labels {
         nodes {
           name
