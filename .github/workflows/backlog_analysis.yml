@@ -1,8 +1,8 @@
-name: Backlog Report
+name: Backlog BI Report
 
 on:
   schedule:
-    - cron: "0 8 * * 1"  # Cada lunes 8 AM
+    - cron: "0 9 * * 1" # Cada lunes a las 9 AM
   workflow_dispatch:
 
 jobs:
@@ -18,17 +18,20 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Generar backlog report
+      - name: Crear carpeta reports
+        run: mkdir -p reports
+
+      - name: Generar Backlog Report
         run: python scripts/generate_report.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INPUT_FILE: "data/linear_issues.json"
           OUTPUT_FILE: "reports/backlog_report.md"
 
-      - name: Commit report
+      - name: Commit backlog report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
-          git add reports/
+          git add reports/backlog_report.md
           git commit -m "Update backlog report" || echo "No changes to commit"
           git push
