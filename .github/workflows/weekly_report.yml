@@ -10,30 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
+      
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
+      
       - run: pip install -r requirements.txt
 
-      - name: Download Linear issues
-        uses: actions/download-artifact@v4
-        with:
-          name: linear_issues
-          path: data/
+      - name: Fetch Linear issues
+        run: |
+          mkdir -p data
+          python scripts/linear_fetch.py --output data/linear_issues.json
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-      - run: python scripts/weekly_report.py
+      - name: Generate Weekly Report
+        run: python scripts/weekly_report.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/weekly_report.md
 
-      - name: Commit report
+      - name: Commit Weekly Report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
           git add reports/
           git commit -m "Update weekly report" || echo "No changes to commit"
-          git push || echo "Push failed, possibly due to permissions"
+          git push || echo "Push failed"
