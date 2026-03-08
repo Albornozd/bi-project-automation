@@ -9,26 +9,30 @@ jobs:
   generate_roadmap:
     runs-on: ubuntu-latest
     steps:
+      # 1️⃣ Checkout
       - uses: actions/checkout@v3
 
+      # 2️⃣ Setup Python
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
+      # 3️⃣ Install dependencies
       - run: pip install -r requirements.txt
 
-      - name: Download Linear Issues
-        uses: actions/download-artifact@v4
-        with:
-          name: linear_issues
-          path: data
+      # 4️⃣ Obtener issues de Linear
+      - run: python scripts/get_linear_issues.py
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
+      # 5️⃣ Ejecutar roadmap generator
       - run: python scripts/roadmap_generator.py
         env:
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/roadmap.md
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
+      # 6️⃣ Commit y push
       - name: Commit roadmap
         run: |
           git config --global user.name "automation-bot"
