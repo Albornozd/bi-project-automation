@@ -2,7 +2,7 @@ name: Weekly BI Report
 
 on:
   schedule:
-    - cron: "0 10 * * 1" # Cada lunes 10 AM
+    - cron: "0 10 * * 1" # Cada lunes a las 10 AM
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Download Linear Issues
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linear_issues
           path: data
