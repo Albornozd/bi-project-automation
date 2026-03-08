@@ -3,8 +3,12 @@ import requests
 import json
 
 LINEAR_API_KEY = os.environ.get("LINEAR_API_KEY")
+OUTPUT_FILE = "data/linear_issues.json"
 
-url = "https://api.linear.app/graphql"
+headers = {
+    "Authorization": LINEAR_API_KEY,
+    "Content-Type": "application/json"
+}
 
 query = """
 {
@@ -12,43 +16,29 @@ query = """
     nodes {
       id
       title
-      description
       state {
         name
       }
+      dueDate
       assignee {
         name
       }
-      dueDate
       labels {
         nodes {
           name
           description
         }
       }
-      createdAt
-      updatedAt
     }
   }
 }
 """
 
-response = requests.post(
-    url,
-    headers={
-        "Authorization": f"Bearer {LINEAR_API_KEY}",
-        "Content-Type": "application/json"
-    },
-    json={"query": query}
-)
-
+response = requests.post("https://api.linear.app/graphql", json={"query": query}, headers=headers)
 data = response.json()
 
-# Guardar JSON completo para análisis posterior
 os.makedirs("data", exist_ok=True)
-with open("data/linear_issues.json", "w") as f:
-    json.dump(data, f, indent=2)
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
 
-print("Linear issues obtenidos:", len(data.get("data", {}).get("issues", {}).get("nodes", [])))
-
-print("Issues guardados en data/linear_issues.json")
+print(f"Linear issues saved to {OUTPUT_FILE}")
