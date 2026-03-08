@@ -1,12 +1,12 @@
-name: Roadmap Generator
+name: Linear Sync
 
 on:
   schedule:
-    - cron: "0 12 * * 1" # Cada lunes 12 PM
+    - cron: "0 */6 * * *" # Cada 6 horas
   workflow_dispatch:
 
 jobs:
-  generate_roadmap:
+  fetch_issues:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,22 +17,12 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Download Linear Issues
-        uses: actions/download-artifact@v3
-        with:
-          name: linear_issues
-          path: data
-
-      - run: python scripts/roadmap_generator.py
+      - run: python scripts/get_linear_issues.py
         env:
-          INPUT_FILE: data/linear_issues.json
-          OUTPUT_FILE: reports/roadmap.md
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-      - name: Commit roadmap
-        run: |
-          git config --global user.name "automation-bot"
-          git config --global user.email "bot@github.com"
-          git add reports/
-          git commit -m "Update roadmap" || echo "no changes"
-          git push
+      - name: Upload Linear Issues
+        uses: actions/upload-artifact@v4
+        with:
+          name: linear_issues
+          path: data/linear_issues.json
