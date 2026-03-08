@@ -1,38 +1,26 @@
-name: Backlog / BI Report Generator
+name: Backlog Report
 
 on:
   schedule:
-    - cron: "0 8 * * 1" # Cada lunes 8 AM
+    - cron: "0 8 * * 1" # Lunes 8 AM
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  report:
+  backlog_report:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
-
-      - name: Get Linear Issues
-        run: python scripts/get_linear_issues.py
+      - run: python scripts/generate_report.py
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-
-      - name: Generate Backlog Report
-        run: python scripts/generate_report.py
-        env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INPUT_FILE: data/linear_issues.json
           OUTPUT_FILE: reports/backlog_report.md
-        continue-on-error: true
-
-      - name: Commit report
+      - name: Commit backlog report
         run: |
           git config --global user.name "automation-bot"
           git config --global user.email "bot@github.com"
