@@ -1,64 +1,43 @@
 import os
 import json
-from datetime import datetime
-from openai import OpenAI, OpenAIError
+from pathlib import Path
+import openai
 
 INPUT_FILE = os.getenv("INPUT_FILE", "data/linear_issues.json")
 OUTPUT_FILE = os.getenv("OUTPUT_FILE", "reports/weekly_report.md")
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
 
-# Cargar issues
+Path("reports").mkdir(parents=True, exist_ok=True)
+
 try:
     with open(INPUT_FILE, encoding="utf-8") as f:
         issues = json.load(f)
 except FileNotFoundError:
     issues = []
-    print(f"Archivo {INPUT_FILE} no encontrado. Generando reporte vacío.")
 
-today = datetime.now().strftime("%Y-%m-%d")
-report_lines = [f"# Weekly BI Report ({today})\n"]
-report_lines.append("Nota: OpenAI falló, reporte estándar.\n")
+def generar_reporte_estandar(issues):
+    report = "# Weekly BI Report - Estándar\n\n"
+    for i in issues:
+        report += f"- {i.get('name','Sin nombre')} - {i.get('status','Sin estado')} - Due: {i.get('due_date','No asignado')}\n"
+    return report
 
-for i in issues:
-    assignee = i.get("assignee")
-    assignee_name = assignee.get("name") if isinstance(assignee, dict) else assignee or "Sin asignar"
-    
-    team = i.get("team")
-    team_name = team.get("name") if isinstance(team, dict) else team or "Sin Team"
-    
-    project = i.get("project")
-    project_name = project.get("name") if isinstance(project, dict) else project or "Sin Project"
-    
-    state = i.get("state")
-    state_name = state.get("name") if isinstance(state, dict) else state or "Sin Estado"
-    
-    due_date = i.get("due_date", "Sin Due Date")
-    labels = i.get("labels", [])
-    labels_str = ", ".join(labels)
-    
-    report_lines.append(
-        f"- [{team_name}/{project_name}] {i.get('title', 'Sin título')} | "
-        f"Asignado a: {assignee_name} | Estado: {state_name} | Due Date: {due_date} | Labels: {labels_str}\n"
+report_text = ""
+try:
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    prompt = f"Genera un reporte semanal de BI en Markdown basado en:\n{json.dumps(issues, indent=2)}"
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role":"user","content":prompt}],
+        temperature=0
     )
+    report_text = response.choices[0].message.content
+except openai.OpenAIError as e:
+    print(f"OpenAI falló, usando reporte estándar: {e}")
+    report_text = generar_reporte_estandar(issues)
+except Exception as e:
+    print(f"Error inesperado: {e}")
+    report_text = generar_reporte_estandar(issues)
 
-report_text = "".join(report_lines)
-
-# Intentar resumen con OpenAI
-if OPENAI_KEY:
-    try:
-        client = OpenAI(api_key=OPENAI_KEY)
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres un asistente que resume issues de BI semanalmente."},
-                {"role": "user", "content": report_text}
-            ],
-            temperature=0.5
-        )
-        report_text = response.choices[0].message.content
-    except OpenAIError as e:
-        print(f"OpenAI falló: {e}. Se mantendrá reporte estándar.")
-
-os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     f.write(report_text)
+
+print(f"Reporte guardado en {OUTPUT_FILE}")
