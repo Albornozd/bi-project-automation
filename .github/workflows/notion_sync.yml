@@ -1,37 +1,19 @@
-name: Notion to Linear Sync
+name: Linear Sync
 
 on:
   schedule:
     - cron: "0 */6 * * *" # Cada 6 horas
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  sync:
+  fetch_issues:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
       - run: pip install -r requirements.txt
-
-      - name: Sync Notion to Linear
-        run: python scripts/notion_to_linear.py
+      - run: python scripts/get_linear_issues.py
         env:
-          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-        continue-on-error: true
-
-      - name: Commit changes
-        run: |
-          git config --global user.name "automation-bot"
-          git config --global user.email "bot@github.com"
-          git add reports/
-          git commit -m "Sync Notion to Linear" || echo "no changes"
-          git push
