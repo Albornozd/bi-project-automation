@@ -17,6 +17,12 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Download Linear issues
+        uses: actions/download-artifact@v4
+        with:
+          name: linear_issues
+          path: data/
+
       - run: python scripts/weekly_report.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
