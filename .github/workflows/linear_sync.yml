@@ -1,4 +1,4 @@
- name: Linear Sync
+name: Linear Sync
 
 on:
   schedule:
