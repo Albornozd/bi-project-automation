@@ -16,26 +16,27 @@ issues = data.get("data", {}).get("issues", {}).get("nodes", [])
 report_text = "# Backlog / BI Report\n\n"
 
 for i in issues:
-    labels_dict = {}
-    for lbl in i.get("labels", {}).get("nodes", []):
-        cat = lbl.get("description", "Otros")
-        labels_dict[cat] = lbl.get("name")
-    
+    labels_dict = {lbl.get("description","Otros"): lbl.get("name") for lbl in i.get("labels", {}).get("nodes", [])}
+
     assignee = i.get("assignee")
     assignee_name = assignee.get("name") if assignee else "Sin asignar"
     state_name = i.get("state", {}).get("name", "-")
     due_date = i.get("dueDate", "Sin fecha")
-    
+    project = i.get("project", {})
+    project_name = project.get("name", "-")
+    team_name = project.get("team", {}).get("name", "-")
+
     report_text += f"- **Título:** {i.get('title')}\n"
     report_text += f"  - Estado: {state_name}\n"
     report_text += f"  - Asignado a: {assignee_name}\n"
     report_text += f"  - Due Date: {due_date}\n"
-    
+    report_text += f"  - Team: {team_name}\n"
+    report_text += f"  - Project: {project_name}\n"
+
     for cat in ["Departamento","Esfuerzo Estimado","Impacto en Negocio","Prioridad","Sociedad","Tipo de Proyecto","Tipo de Trabajo"]:
-        report_text += f"  - {cat}: {labels_dict.get(cat, '-')}\n"
+        report_text += f"  - {cat}: {labels_dict.get(cat,'-')}\n"
     report_text += "\n"
 
-# OpenAI
 try:
     openai.api_key = OPENAI_API_KEY
     response = openai.ChatCompletion.create(
@@ -46,8 +47,7 @@ try:
         ],
         max_tokens=1000
     )
-    report_text_ai = response.choices[0].message.content
-    report_text += "\n\n# Resumen AI\n\n" + report_text_ai
+    report_text += "\n\n# Resumen AI\n\n" + response.choices[0].message.content
 except Exception as e:
     report_text += f"\n\n# Nota: OpenAI falló, reporte estándar.\nError: {str(e)}\n"
 
