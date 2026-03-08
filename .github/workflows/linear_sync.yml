@@ -2,11 +2,11 @@ name: Linear Sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Cada 6 horas
+    - cron: "0 */6 * * *" # Cada 6 horas
   workflow_dispatch:
 
 jobs:
-  fetch-linear:
+  fetch:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,10 +18,16 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Crear carpeta de datos
+      - name: Crear carpeta data
         run: mkdir -p data
 
-      - name: Traer issues de Linear
+      - name: Obtener issues de Linear
         run: python scripts/linear_fetch.py
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
+      - name: Subir artifacts para otros workflows
+        uses: actions/upload-artifact@v4
+        with:
+          name: linear_issues
+          path: data/linear_issues.json
