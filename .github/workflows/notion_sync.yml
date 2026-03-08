@@ -2,7 +2,7 @@ name: Notion to Linear Sync
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # cada 6 horas
+    - cron: "0 */6 * * *" # Cada 6 horas
   workflow_dispatch:
 
 permissions:
@@ -13,44 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Create reports folder
-        run: mkdir -p reports
-
-      - name: Run Notion Sync Script
+      - name: Sync Notion to Linear
         run: python scripts/notion_to_linear.py
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         continue-on-error: true
 
-      - name: Generate fallback report if missing
+      - name: Commit changes
         run: |
-          if [ ! -f reports/notion_sync_report.md ]; then
-            echo "# Notion Sync Report" > reports/notion_sync_report.md
-            echo "" >> reports/notion_sync_report.md
-            echo "Workflow executed but script did not generate report." >> reports/notion_sync_report.md
-            echo "" >> reports/notion_sync_report.md
-            echo "Fallback report generated automatically." >> reports/notion_sync_report.md
-          fi
-
-      - name: Commit report
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "automation-bot"
+          git config --global user.email "bot@github.com"
           git add reports/
-          git commit -m "update notion sync report" || echo "no changes"
+          git commit -m "Sync Notion to Linear" || echo "no changes"
           git push
