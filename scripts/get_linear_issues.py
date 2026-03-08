@@ -2,43 +2,42 @@ import requests
 import os
 import json
 
-LINEAR_API_KEY = os.environ["LINEAR_API_KEY"]
+token = os.environ.get("LINEAR_API_KEY")
 
-url = "https://api.linear.app/graphql"
+headers = {
+    "Authorization": token,
+    "Content-Type": "application/json"
+}
 
 query = """
 {
-  issues(first: 100) {
+  issues(first: 50) {
     nodes {
       id
       title
       description
       priority
-      dueDate
       state {
         name
       }
       assignee {
         name
       }
-      labels {
-        name
-      }
+      createdAt
     }
   }
 }
 """
 
-headers = {
-    "Authorization": LINEAR_API_KEY,
-    "Content-Type": "application/json"
-}
+response = requests.post(
+    "https://api.linear.app/graphql",
+    json={"query": query},
+    headers=headers
+)
 
-response = requests.post(url, json={"query": query}, headers=headers)
 data = response.json()
 
-# Guardar archivo local para que otros scripts lo consuman
-with open("data/linear_issues.json","w") as f:
-    json.dump(data,f,indent=2)
+with open("data/linear_issues.json", "w") as f:
+    json.dump(data, f, indent=2)
 
-print("✅ Issues descargados de Linear")
+print("Issues guardados en data/linear_issues.json")
