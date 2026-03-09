@@ -1,144 +1,93 @@
 import os
-import requests
+from linear import LinearClient
+from notion_client import Client
 
+# --- Configuración ---
 LINEAR_API_KEY = os.environ.get("LINEAR_API_KEY")
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
-NOTION_DATABASE_ID = os.environ.get("BI_INITIATIVES_DB")
+NOTION_DB_ID = os.environ.get("BI_INITIATIVES_DB")
 
-LINEAR_URL = "https://api.linear.app/graphql"
-NOTION_URL = "https://api.notion.com/v1/pages"
+linear_client = LinearClient(api_key=LINEAR_API_KEY)
+notion = Client(auth=NOTION_API_KEY)
 
-LINEAR_HEADERS = {
-    "Authorization": LINEAR_API_KEY,
-    "Content-Type": "application/json"
+# Diccionario para mapear labels de Linear a campos de Notion
+LABEL_MAPPING = {
+    "Sociedad": {
+        "Aristocrazy": "Aristocrazy",
+        "Suarez": "Suarez",
+        "Grupo": "Grupo"
+    },
+    "Esfuerzo": {
+        "XL": "XL",
+        "L": "L",
+        "M": "M",
+        "S": "S"
+    },
+    "Impacto": {
+        "Alto": "Alto",
+        "Medio": "Medio",
+        "Bajo": "Bajo"
+    },
+    "Prioridad": {
+        "Alta": "Alta",
+        "Media": "Media",
+        "Baja": "Baja"
+    },
+    "Tipo de Proyecto": {
+        "Dashboard": "Dashboard",
+        "Data model": "Data model",
+        "Data Pipeline": "Data Pipeline",
+        "Analysis": "Analysis"
+    },
+    "Tipo de Trabajo": {
+        "Funcionalidad (Feature)": "Funcionalidad (Feature)",
+        "Mejora (Improvement)": "Mejora (Improvement)",
+        "Cambio (Change)": "Cambio (Change)"
+    }
 }
 
-NOTION_HEADERS = {
-    "Authorization": f"Bearer {NOTION_API_KEY}",
-    "Notion-Version": "2022-06-28",
-    "Content-Type": "application/json"
-}
+# --- Función para extraer labels ---
+def map_labels(issue_labels, field_name):
+    mapped = []
+    for label in issue_labels:
+        name = label.get("name")
+        if name in LABEL_MAPPING.get(field_name, {}):
+            mapped.append(LABEL_MAPPING[field_name][name])
+    return mapped if mapped else None
 
+# --- Función principal ---
+def sync_issues():
+    issues = linear_client.issues()  # Ajusta el query si quieres filtrar por proyecto
+    for issue in issues:
+        try:
+            issue_labels = issue.labels.nodes if hasattr(issue.labels, "nodes") else []
 
-def validate_env():
-    required = {
-        "LINEAR_API_KEY": LINEAR_API_KEY,
-        "NOTION_API_KEY": NOTION_API_KEY,
-        "BI_INITIATIVES_DB": NOTION_DATABASE_ID
-    }
-
-    for key, value in required.items():
-        if not value:
-            raise Exception(f"Missing environment variable: {key}")
-
-    print("Environment variables validated")
-
-
-def get_linear_issues():
-
-    query = """
-    {
-      issues(first: 50) {
-        nodes {
-          id
-          title
-          state { name }
-          team { name }
-          project { name }
-        }
-      }
-    }
-    """
-
-    response = requests.post(
-        LINEAR_URL,
-        headers=LINEAR_HEADERS,
-        json={"query": query}
-    )
-
-    response.raise_for_status()
-
-    data = response.json()
-
-    return data["data"]["issues"]["nodes"]
-
-
-def create_notion_page(issue):
-
-    title = issue["title"]
-    estado = issue["state"]["name"] if issue["state"] else "Backlog"
-    team = issue["team"]["name"] if issue["team"] else "General"
-    proyecto = issue["project"]["name"] if issue["project"] else "General"
-
-    payload = {
-
-        "parent": {
-            "database_id": NOTION_DATABASE_ID
-        },
-
-        "properties": {
-
-            "Nombre": {   # 👈 nombre correcto de la columna
-                "title": [
-                    {
-                        "text": {
-                            "content": title
-                        }
-                    }
-                ]
-            },
-
-            "Estado": {
-                "status": {
-                    "name": estado
-                }
-            },
-
-            "Proyecto": {
-                "select": {
-                    "name": proyecto
-                }
-            },
-
-            "Team": {
-                "select": {
-                    "name": team
-                }
-            },
-
-            "Departamento": {
-                "multi_select": [
-                    {"name": "BI"}
-                ]
+            # Mapeo de campos de texto o fecha
+            properties = {
+                "Nombre": {"title": [{"text": {"content": issue.title}}]},
+                "Descripcion": {"rich_text": [{"text": {"content": issue.description or ""}}]},
+                "Owner": {"people": [{"name": issue.assignee.name}]} if issue.assignee else None,
+                "Due Date": {"date": {"start": issue.dueDate}} if issue.dueDate else None,
+                "Estado": {"status": {"name": issue.state.name}}
             }
 
-        }
-    }
+            # Mapeo de labels a campos Notion
+            for field in ["Sociedad", "Esfuerzo", "Impacto", "Prioridad", "Tipo de Proyecto", "Tipo de Trabajo"]:
+                mapped = map_labels(issue_labels, field)
+                if mapped:
+                    properties[field] = {"multi_select": [{"name": val} for val in mapped]}
 
-    response = requests.post(
-        NOTION_URL,
-        headers=NOTION_HEADERS,
-        json=payload
-    )
+            # Limpieza de None
+            properties = {k: v for k, v in properties.items() if v is not None}
 
-    if response.status_code != 200:
-        print("Error creando tarea en Notion:")
-        print(response.text)
-    else:
-        print(f"Tarea creada en Notion: {title}")
-
-
-def main():
-
-    validate_env()
-
-    issues = get_linear_issues()
-
-    print(f"Issues encontrados en Linear: {len(issues)}")
-
-    for issue in issues:
-        create_notion_page(issue)
-
+            # Crear o actualizar página en Notion
+            notion.pages.create(
+                parent={"database_id": NOTION_DB_ID},
+                properties=properties
+            )
+            print(f"Issue sincronizado: {issue.title}")
+        except Exception as e:
+            print("Error creando tarea en Notion:", e)
 
 if __name__ == "__main__":
-    main()
+    sync_issues()
