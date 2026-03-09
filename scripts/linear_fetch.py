@@ -1,54 +1,49 @@
+import requests
 import os
 import json
-import requests
-from pathlib import Path
 
-LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
-Path("data").mkdir(parents=True, exist_ok=True)
+API_KEY = os.getenv("LINEAR_API_KEY")
 
-headers = {"Authorization": LINEAR_API_KEY, "Content-Type": "application/json"}
 query = """
 {
   issues(first: 100) {
     nodes {
-      id
-      name
+      title
       description
-      status { name }
       dueDate
-      assignee { name }
-      project { name }
+      state { name }
       team { name }
+      project { name }
       labels { nodes { name } }
     }
   }
 }
 """
 
-response = requests.post("https://api.linear.app/graphql", headers=headers, json={"query": query})
+response = requests.post(
+    "https://api.linear.app/graphql",
+    headers={"Authorization": API_KEY},
+    json={"query": query}
+)
+
 data = response.json()
 
 issues = []
-for i in data.get("data", {}).get("issues", {}).get("nodes", []):
-    labels_dict = {}
-    for label in i.get("labels", {}).get("nodes", []):
-        # Supón que tus labels están en formato "Grupo:Valor"
-        if ":" in label["name"]:
-            group, value = label["name"].split(":", 1)
-            labels_dict[group.strip()] = value.strip()
+
+for i in data["data"]["issues"]["nodes"]:
     issues.append({
-        "id": i.get("id"),
-        "name": i.get("name"),
-        "description": i.get("description"),
-        "status": i.get("status", {}).get("name"),
-        "due_date": i.get("dueDate"),
-        "assignee": i.get("assignee", {}).get("name"),
-        "project": i.get("project", {}).get("name"),
-        "team": i.get("team", {}).get("name"),
-        "labels": labels_dict
+        "title": i["title"],
+        "description": i["description"],
+        "status": i["state"]["name"],
+        "team": i["team"]["name"] if i["team"] else None,
+        "project": i["project"]["name"] if i["project"] else None,
+        "dueDate": i["dueDate"],
+        "labels": [l["name"] for l in i["labels"]["nodes"]]
     })
 
-with open("data/linear_issues.json", "w", encoding="utf-8") as f:
-    json.dump(issues, f, indent=2, ensure_ascii=False)
+os.makedirs("data", exist_ok=True)
 
-print(f"{len(issues)} issues guardados en data/linear_issues.json")
+with open("data/linear_issues.json", "w") as f:
+    json.dump({"issues": issues}, f)
+
+print("Linear issues fetched")
