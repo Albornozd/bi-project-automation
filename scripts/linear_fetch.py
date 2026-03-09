@@ -1,8 +1,8 @@
 import requests
-import os
 import json
+import os
 
-API_KEY = os.getenv("LINEAR_API_KEY")
+LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
 
 query = """
 {
@@ -12,41 +12,41 @@ query = """
       title
       description
       dueDate
-      state { name }
-      team { name }
-      project { name }
-      labels { nodes { name } }
+      state {
+        name
+      }
+      team {
+        name
+      }
+      project {
+        name
+      }
+      labels {
+        nodes {
+          name
+        }
+      }
     }
   }
 }
 """
 
+headers = {
+    "Authorization": LINEAR_API_KEY,
+    "Content-Type": "application/json"
+}
+
 response = requests.post(
     "https://api.linear.app/graphql",
-    headers={"Authorization": API_KEY},
-    json={"query": query}
+    json={"query": query},
+    headers=headers
 )
 
 data = response.json()
 
-issues = []
+issues = data["data"]["issues"]["nodes"]
 
-for issue in data["data"]["issues"]["nodes"]:
+with open("linear_issues.json", "w") as f:
+    json.dump(issues, f, indent=2)
 
-    issues.append({
-        "id": issue["id"],
-        "title": issue["title"],
-        "description": issue["description"],
-        "status": issue["state"]["name"],
-        "team": issue["team"]["name"] if issue["team"] else None,
-        "project": issue["project"]["name"] if issue["project"] else None,
-        "dueDate": issue["dueDate"],
-        "labels": [l["name"] for l in issue["labels"]["nodes"]]
-    })
-
-os.makedirs("data", exist_ok=True)
-
-with open("data/linear_issues.json", "w") as f:
-    json.dump({"issues": issues}, f)
-
-print("Linear issues fetched")
+print(f"Issues fetched: {len(issues)}")
