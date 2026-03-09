@@ -78,7 +78,7 @@ def create_notion_page(issue):
 
         "properties": {
 
-            "Name": {
+            "Nombre": {   # 👈 nombre correcto de la columna
                 "title": [
                     {
                         "text": {
