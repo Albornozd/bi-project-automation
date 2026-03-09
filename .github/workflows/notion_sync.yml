@@ -27,14 +27,9 @@ jobs:
         run: |
           pip install requests
 
-      - name: Fetch Linear Issues
+      - name: Run Linear → Notion Sync
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-        run: |
-          python scripts/fetch_linear_issues.py
-
-      - name: Push Issues to Notion
-        env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           BI_INITIATIVES_DB: ${{ secrets.BI_INITIATIVES_DB }}
         run: |
