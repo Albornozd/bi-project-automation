@@ -14,10 +14,30 @@ headers = {
 with open("data/linear_issues.json") as f:
     data = json.load(f)
 
+def extract_label(labels, keyword):
+
+    for label in labels:
+        if keyword.lower() in label.lower():
+            return label
+
+    return None
+
+
 for issue in data["issues"]:
+
+    labels = issue["labels"]
+
+    departamento = extract_label(labels, "Departamento")
+    sociedad = extract_label(labels, "Sociedad")
+    esfuerzo = extract_label(labels, "Esfuerzo")
+    impacto = extract_label(labels, "Impacto")
+    prioridad = extract_label(labels, "Prioridad")
+    tipo_proyecto = extract_label(labels, "Tipo de Proyecto")
+    tipo_trabajo = extract_label(labels, "Tipo de Trabajo")
 
     payload = {
         "parent": {"database_id": DATABASE_ID},
+
         "properties": {
 
             "Nombre": {
@@ -29,22 +49,62 @@ for issue in data["issues"]:
             },
 
             "Team": {
-                "select": {"name": issue["team"]}
+                "select": {"name": issue["team"]} if issue["team"] else None
             },
 
             "Proyecto": {
-                "select": {"name": issue["project"]}
+                "select": {"name": issue["project"]} if issue["project"] else None
             },
 
-            "Status": {
+            "Estado": {
                 "status": {"name": issue["status"]}
             },
 
             "Due Date": {
                 "date": {"start": issue["dueDate"]}
-            } if issue["dueDate"] else None
+            } if issue["dueDate"] else None,
+
+            "Descripcion": {
+                "rich_text": [{
+                    "text": {
+                        "content": issue["description"] or ""
+                    }
+                }]
+            },
+
+            "Departamento": {
+                "select": {"name": departamento}
+            } if departamento else None,
+
+            "Sociedad": {
+                "select": {"name": sociedad}
+            } if sociedad else None,
+
+            "Esfuerzo": {
+                "select": {"name": esfuerzo}
+            } if esfuerzo else None,
+
+            "Impacto": {
+                "select": {"name": impacto}
+            } if impacto else None,
+
+            "Prioridad": {
+                "select": {"name": prioridad}
+            } if prioridad else None,
+
+            "Tipo de Proyecto": {
+                "select": {"name": tipo_proyecto}
+            } if tipo_proyecto else None,
+
+            "Tipo de Trabajo": {
+                "select": {"name": tipo_trabajo}
+            } if tipo_trabajo else None
 
         }
+    }
+
+    payload["properties"] = {
+        k: v for k, v in payload["properties"].items() if v is not None
     }
 
     requests.post(
