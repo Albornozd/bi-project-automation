@@ -1,228 +1,174 @@
 import os
 import requests
+import json
 
-LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
-NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-DATABASE_ID = os.getenv("BI_INITIATIVES_DB")
-
-LINEAR_URL = "https://api.linear.app/graphql"
+# --------------------------
+# Configuración
+# --------------------------
+LINEAR_API_KEY = os.environ.get("LINEAR_API_KEY")
+NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
+DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
+LINEAR_GRAPHQL_URL = "https://api.linear.app/graphql"
 NOTION_URL = "https://api.notion.com/v1"
 
-# -------------------------
-# Label mapping
-# -------------------------
-
-label_mapping = {
-
-"Digital": ("Departamento","Digital"),
-"BI": ("Departamento","BI"),
-"RRHH": ("Departamento","RRHH"),
-"IT": ("Departamento","IT"),
-"Finanzas": ("Departamento","Finanzas"),
-"Administración": ("Departamento","Administración"),
-"Logística": ("Departamento","Logística"),
-"Producto": ("Departamento","Producto"),
-"Retail": ("Departamento","Retail"),
-"Marketing": ("Departamento","Marketing"),
-"Postventa": ("Departamento","Postventa"),
-"Gemología": ("Departamento","Gemología"),
-"Relojería": ("Departamento","Relojería"),
-"Diseño": ("Departamento","Diseño"),
-"Proyecto FABRIC": ("Departamento","Proyecto FABRIC"),
-"Producción (Fabricación)": ("Departamento","Producción (Fabricación)"),
-
-"Aristocrazy": ("Sociedad","Aristocrazy"),
-"Suarez": ("Sociedad","Suarez"),
-"Grupo": ("Sociedad","Grupo"),
-
-"XL": ("Esfuerzo","XL"),
-"L": ("Esfuerzo","L"),
-"M": ("Esfuerzo","M"),
-"S": ("Esfuerzo","S"),
-
-"Alto": ("Impacto","Alto"),
-"Medio": ("Impacto","Medio"),
-"Bajo": ("Impacto","Bajo"),
-
-"Alta": ("Prioridad","Alta"),
-"Media": ("Prioridad","Media"),
-"Baja": ("Prioridad","Baja"),
-
-"Dashboard": ("Tipo Proyecto","Dashboard"),
-"Data model": ("Tipo Proyecto","Data model"),
-"Data Pipeline": ("Tipo Proyecto","Data Pipeline"),
-"Analysis": ("Tipo Proyecto","Analysis"),
-
-"Funcionalidad (Feature)": ("Tipo Trabajo","Funcionalidad (Feature)"),
-"Mejora (Improvement)": ("Tipo Trabajo","Mejora (Improvement)"),
-"Cambio (Change)": ("Tipo Trabajo","Cambio (Change)")
+HEADERS_LINEAR = {
+    "Authorization": f"Bearer {LINEAR_API_KEY}",
+    "Content-Type": "application/json"
 }
 
-# -------------------------
-# Linear query
-# -------------------------
+HEADERS_NOTION = {
+    "Authorization": f"Bearer {NOTION_API_KEY}",
+    "Notion-Version": "2022-06-28",
+    "Content-Type": "application/json"
+}
 
-query = """
-{
-  issues(first:50){
-    nodes{
-      id
-      title
-      description
-      dueDate
-      state{ name }
-      team{ name }
-      project{ name }
-      assignee{ name }
-      labels{ nodes{ name } }
+# --------------------------
+# Mapping Linear → Notion
+# --------------------------
+LABEL_MAPPING = {
+    "Departamento": {
+        "Digital":"Departamento","BI":"Departamento","RRHH":"Departamento","IT":"Departamento",
+        "Finanzas":"Departamento","Administración":"Departamento","Logística":"Departamento",
+        "Producto":"Departamento","Retail":"Departamento","Marketing":"Departamento",
+        "Postventa":"Departamento","Gemología":"Departamento","Relojería":"Departamento",
+        "Diseño":"Departamento","Proyecto FABRIC":"Departamento","Producción (Fabricación)":"Departamento"
+    },
+    "Sociedad": {
+        "Aristocrazy":"Sociedad","Suarez":"Sociedad","Grupo":"Sociedad"
+    },
+    "Esfuerzo Estimado": {
+        "XL":"Esfuerzo","L":"Esfuerzo","M":"Esfuerzo","S":"Esfuerzo"
+    },
+    "Impacto en Negocio": {
+        "Alto":"Impacto","Medio":"Impacto","Bajo":"Impacto"
+    },
+    "Prioridad": {
+        "Alta":"Prioridad","Media":"Prioridad","Baja":"Prioridad"
+    },
+    "Tipo Proyecto": {
+        "Dashboard":"Tipo Proyecto","Data model":"Tipo Proyecto","Data Pipeline":"Tipo Proyecto","Analysis":"Tipo Proyecto"
+    },
+    "Tipo Trabajo": {
+        "Funcionalidad (Feature)":"Tipo Trabajo","Mejora (Improvement)":"Tipo Trabajo","Cambio (Change)":"Tipo Trabajo"
     }
-  }
-}
-"""
-
-headers_linear = {
-"Authorization": LINEAR_API_KEY,
-"Content-Type":"application/json"
 }
 
-response = requests.post(
-LINEAR_URL,
-headers=headers_linear,
-json={"query":query}
-)
+# --------------------------
+# Fetch issues de Linear
+# --------------------------
+def fetch_linear_issues():
+    query = """
+    query {
+      issues {
+        nodes {
+          id
+          title
+          description
+          state { name }
+          assignee { name }
+          dueDate
+          team { name }
+          project { name }
+          labels { nodes { name } }
+        }
+      }
+    }
+    """
+    resp = requests.post(LINEAR_GRAPHQL_URL, headers=HEADERS_LINEAR, json={"query": query})
+    data = resp.json()
+    return data["data"]["issues"]["nodes"]
 
-issues = response.json()["data"]["issues"]["nodes"]
-
-print("Issues fetched:",len(issues))
-
-# -------------------------
-# Notion headers
-# -------------------------
-
-headers_notion = {
-"Authorization":f"Bearer {NOTION_API_KEY}",
-"Content-Type":"application/json",
-"Notion-Version":"2022-06-28"
-}
-
-# -------------------------
-# Search issue in Notion
-# -------------------------
-
+# --------------------------
+# Find page en Notion
+# --------------------------
 def find_page(linear_id):
-
-    url=f"{NOTION_URL}/databases/{DATABASE_ID}/query"
-
-    payload={
-        "filter":{
-            "property":"Linear ID",
-            "rich_text":{
-                "equals":linear_id
+    url = f"{NOTION_URL}/databases/{DATABASE_ID}/query"
+    payload = {
+        "filter": {
+            "property": "Linear ID",
+            "rich_text": {
+                "equals": linear_id
             }
         }
     }
 
-    res=requests.post(url,headers=headers_notion,json=payload)
+    res = requests.post(url, headers=HEADERS_NOTION, json=payload)
+    
+    try:
+        data = res.json()
+    except Exception as e:
+        print("Error parsing Notion response:", e)
+        print("Response content:", res.text)
+        return None
 
-    results=res.json()["results"]
+    if "results" not in data:
+        print("Notion query failed. Full response:", data)
+        return None
 
+    results = data["results"]
     return results[0]["id"] if results else None
 
-# -------------------------
-# Build properties
-# -------------------------
-
-def build_properties(issue):
-
-    labels = issue.get("labels",{}).get("nodes",[])
-
+# --------------------------
+# Transform labels a Notion
+# --------------------------
+def map_labels(labels):
     mapped = {}
-
     for label in labels:
-
         name = label["name"]
+        for group, mapping in LABEL_MAPPING.items():
+            if name in mapping:
+                mapped[mapping[name]] = name
+    return mapped
 
-        if name in label_mapping:
+# --------------------------
+# Crear o actualizar página
+# --------------------------
+def upsert_notion(issue):
+    linear_id = issue["id"]
+    page_id = find_page(linear_id)
+    
+    # Mapping de campos
+    labels_mapped = map_labels(issue.get("labels", {}).get("nodes", []))
 
-            field,value = label_mapping[name]
-
-            mapped[field] = value
-
-    assignee = issue.get("assignee")
-
-    properties={
-
-        "Nombre":{
-            "title":[{"text":{"content":issue["title"]}}]
-        },
-
-        "Descripcion":{
-            "rich_text":[{"text":{"content":issue.get("description") or ""}}]
-        },
-
-        "Estado":{
-            "status":{"name":issue["state"]["name"]}
-        },
-
-        "Owner":{
-            "rich_text":[{"text":{"content":assignee["name"] if assignee else ""}}]
-        },
-
-        "Due Date":{
-            "date":{"start":issue["dueDate"]}
-        } if issue.get("dueDate") else None,
-
-        "Team":{
-            "rich_text":[{"text":{"content":issue.get("team",{}).get("name","")}}]
-        },
-
-        "Proyecto":{
-            "rich_text":[{"text":{"content":issue.get("project",{}).get("name","")}}]
-        },
-
-        "Linear ID":{
-            "rich_text":[{"text":{"content":issue["id"]}}]
-        }
-
+    props = {
+        "Nombre": {"title":[{"text":{"content":issue.get("title","")}}]},
+        "Descripcion": {"rich_text":[{"text":{"content":issue.get("description","")}}]},
+        "Estado": {"status":{"name":issue.get("state", {}).get("name","")}},
+        "Owner": {"rich_text":[{"text":{"content":issue.get("assignee", {}).get("name","")}}]},
+        "Due Date": {"date":{"start":issue.get("dueDate")}},
+        "Team": {"rich_text":[{"text":{"content":issue.get("team", {}).get("name","")}}]},
+        "Proyecto": {"rich_text":[{"text":{"content":issue.get("project", {}).get("name","")}}]},
     }
 
-    for field,value in mapped.items():
-
-        properties[field]={"select":{"name":value}}
-
-    return {k:v for k,v in properties.items() if v}
-
-# -------------------------
-# Sync loop
-# -------------------------
-
-for issue in issues:
-
-    linear_id = issue["id"]
-
-    page_id = find_page(linear_id)
-
-    properties = build_properties(issue)
+    # Agregar labels mapeados
+    for k,v in labels_mapped.items():
+        props[k] = {"select":{"name":v}}
 
     if page_id:
-
-        print("Updating:",issue["title"])
-
-        requests.patch(
-            f"{NOTION_URL}/pages/{page_id}",
-            headers=headers_notion,
-            json={"properties":properties}
-        )
-
+        url = f"{NOTION_URL}/pages/{page_id}"
+        res = requests.patch(url, headers=HEADERS_NOTION, json={"properties": props})
     else:
+        url = f"{NOTION_URL}/pages"
+        body = {
+            "parent": {"database_id": DATABASE_ID},
+            "properties": props
+        }
+        res = requests.post(url, headers=HEADERS_NOTION, json=body)
 
-        print("Creating:",issue["title"])
+    if res.status_code not in [200, 201]:
+        print("Notion status:", res.status_code)
+        print(res.text)
+    else:
+        print(f"Notion page synced for Linear ID {linear_id}")
 
-        requests.post(
-            f"{NOTION_URL}/pages",
-            headers=headers_notion,
-            json={
-                "parent":{"database_id":DATABASE_ID},
-                "properties":properties
-            }
-        )
+# --------------------------
+# Main
+# --------------------------
+def main():
+    issues = fetch_linear_issues()
+    print(f"Issues fetched: {len(issues)}")
+    for issue in issues:
+        upsert_notion(issue)
+
+if __name__ == "__main__":
+    main()
