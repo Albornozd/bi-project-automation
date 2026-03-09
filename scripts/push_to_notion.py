@@ -20,7 +20,7 @@ for issue in data["issues"]:
         "parent": {"database_id": DATABASE_ID},
         "properties": {
 
-            "Title": {
+            "Nombre": {
                 "title": [{
                     "text": {
                         "content": issue["title"]
@@ -32,7 +32,7 @@ for issue in data["issues"]:
                 "select": {"name": issue["team"]}
             },
 
-            "Project": {
+            "Proyecto": {
                 "select": {"name": issue["project"]}
             },
 
