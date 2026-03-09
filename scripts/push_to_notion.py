@@ -1,119 +1,95 @@
-import os
 import json
 import requests
+import os
 
-NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 DATABASE_ID = os.getenv("BI_INITIATIVES_DB")
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
-    "Notion-Version": "2022-06-28",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28"
 }
 
-with open("data/linear_issues.json") as f:
-    data = json.load(f)
+with open("linear_issues.json") as f:
+    issues = json.load(f)
 
-def extract_label(labels, keyword):
+for issue in issues:
 
-    for label in labels:
-        if keyword.lower() in label.lower():
-            return label
-
-    return None
-
-
-for issue in data["issues"]:
-
-    labels = issue["labels"]
-
-    departamento = extract_label(labels, "Departamento")
-    sociedad = extract_label(labels, "Sociedad")
-    esfuerzo = extract_label(labels, "Esfuerzo")
-    impacto = extract_label(labels, "Impacto")
-    prioridad = extract_label(labels, "Prioridad")
-    tipo_proyecto = extract_label(labels, "Tipo de Proyecto")
-    tipo_trabajo = extract_label(labels, "Tipo de Trabajo")
+    labels = [l["name"] for l in issue.get("labels", {}).get("nodes", [])]
 
     payload = {
-        "parent": {"database_id": DATABASE_ID},
-
+        "parent": { "database_id": DATABASE_ID },
         "properties": {
 
             "Nombre": {
-                "title": [{
-                    "text": {
-                        "content": issue["title"]
+                "title": [
+                    {
+                        "text": {
+                            "content": issue["title"]
+                        }
                     }
-                }]
+                ]
             },
 
             "Team": {
-                "select": {"name": issue["team"]} if issue["team"] else None
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": issue["team"]["name"] if issue.get("team") else ""
+                        }
+                    }
+                ]
             },
 
             "Proyecto": {
-                "select": {"name": issue["project"]} if issue["project"] else None
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": issue["project"]["name"] if issue.get("project") else ""
+                        }
+                    }
+                ]
             },
 
             "Estado": {
-                "status": {"name": issue["status"]}
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": issue["state"]["name"] if issue.get("state") else ""
+                        }
+                    }
+                ]
+            },
+
+            "Descripcion": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": issue["description"][:1000] if issue.get("description") else ""
+                        }
+                    }
+                ]
             },
 
             "Due Date": {
-                "date": {"start": issue["dueDate"]}
-            } if issue["dueDate"] else None,
-
-            "Descripcion": {
-                "rich_text": [{
-                    "text": {
-                        "content": issue["description"] or ""
-                    }
-                }]
-            },
-
-            "Departamento": {
-                "select": {"name": departamento}
-            } if departamento else None,
-
-            "Sociedad": {
-                "select": {"name": sociedad}
-            } if sociedad else None,
-
-            "Esfuerzo": {
-                "select": {"name": esfuerzo}
-            } if esfuerzo else None,
-
-            "Impacto": {
-                "select": {"name": impacto}
-            } if impacto else None,
-
-            "Prioridad": {
-                "select": {"name": prioridad}
-            } if prioridad else None,
-
-            "Tipo de Proyecto": {
-                "select": {"name": tipo_proyecto}
-            } if tipo_proyecto else None,
-
-            "Tipo de Trabajo": {
-                "select": {"name": tipo_trabajo}
-            } if tipo_trabajo else None
+                "date": {
+                    "start": issue["dueDate"]
+                } if issue.get("dueDate") else None
+            }
 
         }
     }
 
-    payload["properties"] = {
-        k: v for k, v in payload["properties"].items() if v is not None
-    }
+    url = "https://api.notion.com/v1/pages"
 
     response = requests.post(
-        "https://api.notion.com/v1/pages",
+        url,
         headers=headers,
         json=payload
     )
 
     print(response.status_code)
-    print(response.text)
 
-print("Issues pushed to Notion")
+    if response.status_code != 200:
+        print(response.text)
