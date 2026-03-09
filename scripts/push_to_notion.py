@@ -6,7 +6,7 @@ NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 DATABASE_ID = os.getenv("BI_INITIATIVES_DB")
 
 headers = {
-    "Authorization": f"Bearer {NOTION_TOKEN}",
+    "Authorization": f"Bearer {NOTION_API_KEY}",
     "Notion-Version": "2022-06-28",
     "Content-Type": "application/json"
 }
