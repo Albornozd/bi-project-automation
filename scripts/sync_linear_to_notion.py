@@ -19,34 +19,14 @@ NOTION_HEADERS = {
     "Content-Type": "application/json"
 }
 
-# Diccionario para mapear labels de Linear a campos de Notion
+# Diccionario de mapping de labels Linear → Notion
 LABEL_MAPPING = {
-    # Sociedad
-    "Aristocrazy": ("Sociedad", "Aristocrazy"),
-    "Suarez": ("Sociedad", "Suarez"),
-    "Grupo": ("Sociedad", "Grupo"),
-    # Esfuerzo Estimado
-    "XL": ("Esfuerzo", "XL"),
-    "L": ("Esfuerzo", "L"),
-    "M": ("Esfuerzo", "M"),
-    "S": ("Esfuerzo", "S"),
-    # Impacto en Negocio
-    "Alto": ("Impacto", "Alto"),
-    "Medio": ("Impacto", "Medio"),
-    "Bajo": ("Impacto", "Bajo"),
-    # Prioridad
-    "Alta": ("Prioridad", "Alta"),
-    "Media": ("Prioridad", "Media"),
-    "Baja": ("Prioridad", "Baja"),
-    # Tipo Proyecto
-    "Dashboard": ("Tipo de Proyecto", "Dashboard"),
-    "Data model": ("Tipo de Proyecto", "Data model"),
-    "Data Pipeline": ("Tipo de Proyecto", "Data Pipeline"),
-    "Analysis": ("Tipo de Proyecto", "Analysis"),
-    # Tipo Trabajo
-    "Funcionalidad (Feature)": ("Tipo de Trabajo", "Funcionalidad (Feature)"),
-    "Mejora (Improvement)": ("Tipo de Trabajo", "Mejora (Improvement)"),
-    "Cambio (Change)": ("Tipo de Trabajo", "Cambio (Change)")
+    "Sociedad": ["Aristocrazy", "Suarez", "Grupo"],
+    "Esfuerzo": ["XL", "L", "M", "S"],
+    "Impacto": ["Alto", "Medio", "Bajo"],
+    "Prioridad": ["Alta", "Media", "Baja"],
+    "Tipo de Proyecto": ["Dashboard", "Data model", "Data Pipeline", "Analysis"],
+    "Tipo de Trabajo": ["Funcionalidad (Feature)", "Mejora (Improvement)", "Cambio (Change)"]
 }
 
 def validate_env():
@@ -60,6 +40,7 @@ def validate_env():
             raise Exception(f"Missing environment variable: {key}")
     print("Environment variables validated")
 
+
 def get_linear_issues():
     query = """
     {
@@ -71,9 +52,9 @@ def get_linear_issues():
           state { name }
           team { name }
           project { name }
-          dueDate
           assignee { name }
-          labels(first: 10) { nodes { name } }
+          dueDate
+          labels(first:10) { nodes { name } }
         }
       }
     }
@@ -83,57 +64,53 @@ def get_linear_issues():
     data = response.json()
     return data["data"]["issues"]["nodes"]
 
-def map_labels(labels):
-    mapped = {
-        "Sociedad": [],
-        "Prioridad": [],
-        "Impacto": [],
-        "Esfuerzo": [],
-        "Tipo de Trabajo": [],
-        "Tipo de Proyecto": []
-    }
-    for label_node in labels:
-        name = label_node.get("name")
-        if name in LABEL_MAPPING:
-            field, value = LABEL_MAPPING[name]
-            mapped[field].append(value)
-    return mapped
+
+def map_label_to_field(label_nodes, field_name):
+    """Mapea los labels de Linear al campo select de Notion según LABEL_MAPPING"""
+    for label in label_nodes:
+        name = label.get("name")
+        if name in LABEL_MAPPING.get(field_name, []):
+            return name
+    return "None"  # default si no hay label
+
 
 def create_notion_page(issue):
-    title = issue.get("title", "Sin título")
-    estado = issue.get("state", {}).get("name", "Backlog")
-    team = issue.get("team", {}).get("name", "General")
-    proyecto = issue.get("project", {}).get("name", "General")
-    descripcion = issue.get("description", "")
-    owner = issue.get("assignee", {}).get("name", "")
-    due_date = issue.get("dueDate", None)
+    title = issue.get("title") or "Sin título"
+    estado = issue.get("state", {}).get("name") or "Backlog"
+    team = issue.get("team", {}).get("name") or "General"
+    proyecto = issue.get("project", {}).get("name") or "General"
+    owner = issue.get("assignee", {}).get("name") if issue.get("assignee") else ""
+    due_date = issue.get("dueDate") or None
+    descripcion = issue.get("description") or ""
 
     labels = issue.get("labels", {}).get("nodes", [])
-    mapped_labels = map_labels(labels)
+
+    sociedad = map_label_to_field(labels, "Sociedad")
+    prioridad = map_label_to_field(labels, "Prioridad")
+    impacto = map_label_to_field(labels, "Impacto")
+    esfuerzo = map_label_to_field(labels, "Esfuerzo")
+    tipo_trabajo = map_label_to_field(labels, "Tipo de Trabajo")
+    tipo_proyecto = map_label_to_field(labels, "Tipo de Proyecto")
 
     payload = {
         "parent": {"database_id": NOTION_DATABASE_ID},
         "properties": {
-            "Nombre": {
-                "title": [{"text": {"content": title}}]
-            },
-            "Estado": {"status": {"name": estado}},
-            "Proyecto": {"select": {"name": proyecto}},
-            "Team": {"select": {"name": team}},
-            "Departamento": {"multi_select": [{"name": "BI"}]},
+            "Nombre": {"title": [{"text": {"content": title}}]},
             "Descripcion": {"rich_text": [{"text": {"content": descripcion}}]},
-            "Owner": {"rich_text": [{"text": {"content": owner}}]},
+            "Owner": {"people": [{"name": owner}]} if owner else {"rich_text": [{"text": {"content": ""}}]},
+            "Due Date": {"date": {"start": due_date}} if due_date else {"rich_text": [{"text": {"content": ""}}]},
+            "Estado": {"status": {"name": estado}},
+            "Proyecto": {"select": {"name": proyecto or "None"}},
+            "Team": {"select": {"name": team or "None"}},
+            "Departamento": {"multi_select": [{"name": "BI"}]},
+            "Sociedad": {"select": {"name": sociedad}},
+            "Prioridad": {"select": {"name": prioridad}},
+            "Impacto": {"select": {"name": impacto}},
+            "Esfuerzo": {"select": {"name": esfuerzo}},
+            "Tipo de Trabajo": {"select": {"name": tipo_trabajo}},
+            "Tipo de Proyecto": {"select": {"name": tipo_proyecto}}
         }
     }
-
-    # Añadir Due Date si existe
-    if due_date:
-        payload["properties"]["Due Date"] = {"date": {"start": due_date}}
-
-    # Añadir labels mapeados
-    for field, values in mapped_labels.items():
-        if values:
-            payload["properties"][field] = {"multi_select": [{"name": v} for v in values]}
 
     response = requests.post(NOTION_URL, headers=NOTION_HEADERS, json=payload)
     if response.status_code != 200:
@@ -142,12 +119,14 @@ def create_notion_page(issue):
     else:
         print(f"Tarea creada en Notion: {title}")
 
+
 def main():
     validate_env()
     issues = get_linear_issues()
     print(f"Issues encontrados en Linear: {len(issues)}")
     for issue in issues:
         create_notion_page(issue)
+
 
 if __name__ == "__main__":
     main()
