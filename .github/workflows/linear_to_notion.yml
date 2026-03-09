@@ -1,13 +1,12 @@
-name: Sync Linear to Notion
+name: Linear to Notion Sync
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   sync:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -18,14 +17,14 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: pip install requests
 
       - name: Run sync
-        run: python scripts/sync_linear_to_notion.py
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          BI_INITIATIVES_DB: ${{ secrets.BI_INITIATIVES_DB }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python sync_linear_to_notion.py
