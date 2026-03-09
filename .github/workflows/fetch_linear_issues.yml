@@ -1,13 +1,12 @@
-name: Linear to Notion
+name: Fetch Linear Issues
 
 on:
-  workflow_dispatch: # Se puede ejecutar manualmente
-  schedule:
-    - cron: '0 9 * * *' # Todos los días a las 9 AM
+  workflow_dispatch:  # Se puede ejecutar manualmente
 
 jobs:
-  fetch_and_push:
+  fetch_json:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -25,7 +24,8 @@ jobs:
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-      - name: Push to Notion
-        run: python scripts/push_to_notion.py
-        env:
-          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      - name: Show generated JSON
+        run: |
+          echo "======= JSON OUTPUT ======="
+          cat issues.json
+          echo "==========================="
