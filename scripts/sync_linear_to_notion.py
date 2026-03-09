@@ -1,29 +1,34 @@
 import os
 import requests
+import json
 
+# ==========================
 # Variables de entorno
+# ==========================
 LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_DB_ID = os.getenv("BI_INITIATIVES_DB")
 
-# Validar variables de entorno
 if not LINEAR_API_KEY or not NOTION_API_KEY or not NOTION_DB_ID:
-    raise ValueError("Debes definir LINEAR_API_KEY, NOTION_API_KEY y BI_INITIATIVES_DB como secrets en GitHub.")
+    raise ValueError("Revisa que los secrets LINEAR_API_KEY, NOTION_API_KEY y BI_INITIATIVES_DB estén definidos.")
 
-# Headers Linear
+# ==========================
+# Headers
+# ==========================
 linear_headers = {
     "Authorization": f"Bearer {LINEAR_API_KEY}",
     "Content-Type": "application/json"
 }
 
-# Headers Notion
 notion_headers = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Notion-Version": "2022-06-28",
     "Content-Type": "application/json"
 }
 
+# ==========================
 # Diccionarios para mapear labels
+# ==========================
 departamento = ["Administración","BI","IT","Finanzas","Logística","RRHH","Producto","Digital","Retail","Marketing","Postventa","Gemología","Diseño","Producción (Fabricación)","Proyecto FABRIC"]
 sociedad = ["Aristocrazy","Suarez","Grupo"]
 esfuerzo = ["XL","L","M","S"]
@@ -32,6 +37,9 @@ prioridad = ["Alta","Media","Baja"]
 tipo_proyecto = ["Analysis","Dashboard","Data Model","Data Pipeline","Machine Learning"]
 tipo_trabajo = ["Análisis (Analysis)","Cambio (Change)","Funcionalidad (Feature)","Mejora (Improvement)"]
 
+# ==========================
+# Funciones
+# ==========================
 def get_linear_issues():
     url = "https://api.linear.app/graphql"
     query = """
@@ -41,19 +49,34 @@ def get_linear_issues():
           id
           title
           description
-          state { name }
-          assignee { name }
+          state {
+            name
+          }
+          assignee {
+            name
+          }
           dueDate
-          labels { nodes { name } }
-          project { name }
-          team { name }
+          labels {
+            nodes {
+              name
+            }
+          }
+          project {
+            name
+          }
+          team {
+            name
+          }
         }
       }
     }
     """
     response = requests.post(url, json={"query": query}, headers=linear_headers)
     response.raise_for_status()
-    return response.json()["data"]["issues"]["nodes"]
+    data = response.json()
+    issues = data.get("data", {}).get("issues", {}).get("nodes", [])
+    print(f"Issues fetched: {len(issues)}")
+    return issues
 
 def classify_labels(labels):
     groups = {
@@ -83,67 +106,69 @@ def classify_labels(labels):
             groups["Tipo Trabajo"] = name
     return groups
 
-def find_page(linear_id):
-    """Busca si el issue ya existe en Notion usando un filter por Linear ID"""
-    query_url = f"https://api.notion.com/v1/databases/{NOTION_DB_ID}/query"
-    filter_payload = {
+def find_page(title):
+    """Busca si la página ya existe en Notion por título"""
+    url = "https://api.notion.com/v1/databases/{}/query".format(NOTION_DB_ID)
+    payload = {
         "filter": {
-            "property": "Linear ID",
-            "rich_text": {
-                "equals": linear_id
-            }
+            "property": "Nombre",
+            "title": {"equals": title}
         }
     }
-    resp = requests.post(query_url, headers=notion_headers, json=filter_payload)
-    resp.raise_for_status()
-    results = resp.json().get("results", [])
-    if results:
-        return results[0]["id"]
-    return None
+    response = requests.post(url, headers=notion_headers, json=payload)
+    data = response.json()
+    results = data.get("results", [])
+    return results[0]["id"] if results else None
 
 def upsert_notion(issue):
-    linear_id = issue["id"]
-    page_id = find_page(linear_id)
     labels = classify_labels(issue.get("labels", {}).get("nodes", []))
-    
+    page_id = find_page(issue.get("title"))
+
     properties = {
-        "Linear ID": {"rich_text": [{"text": {"content": linear_id}}]},
         "Nombre": {"title": [{"text": {"content": issue.get("title") or ""}}]},
         "Descripcion": {"rich_text": [{"text": {"content": issue.get("description") or ""}}]},
         "Estado": {"status": {"name": issue.get("state", {}).get("name") or "Unknown"}},
-        "Owner": {"rich_text": [{"text": {"content": issue.get("assignee", {}).get("name") or ""}}]},
+        "Owner": {"rich_text":[{"text":{"content": issue.get("assignee")["name"] if issue.get("assignee") else ""}}]},
         "Due Date": {"date": {"start": issue.get("dueDate")}},
-        "Proyecto": {"rich_text": [{"text": {"content": issue.get("project", {}).get("name") or ""}}]},
-        "Team": {"rich_text": [{"text": {"content": issue.get("team", {}).get("name") or ""}}]},
-        "Departamento": {"select": {"name": labels["Departamento"]}} if labels["Departamento"] else {},
-        "Sociedad": {"select": {"name": labels["Sociedad"]}} if labels["Sociedad"] else {},
-        "Esfuerzo": {"select": {"name": labels["Esfuerzo"]}} if labels["Esfuerzo"] else {},
-        "Impacto": {"select": {"name": labels["Impacto"]}} if labels["Impacto"] else {},
-        "Prioridad": {"select": {"name": labels["Prioridad"]}} if labels["Prioridad"] else {},
-        "Tipo Proyecto": {"select": {"name": labels["Tipo Proyecto"]}} if labels["Tipo Proyecto"] else {},
-        "Tipo Trabajo": {"select": {"name": labels["Tipo Trabajo"]}} if labels["Tipo Trabajo"] else {},
+        "Proyecto": {"rich_text":[{"text":{"content": issue.get("project", {}).get("name") or ""}}]},
+        "Team": {"rich_text":[{"text":{"content": issue.get("team", {}).get("name") or ""}}]},
+        "Departamento": {"select":{"name": labels["Departamento"]}} if labels["Departamento"] else {},
+        "Sociedad": {"select":{"name": labels["Sociedad"]}} if labels["Sociedad"] else {},
+        "Esfuerzo": {"select":{"name": labels["Esfuerzo"]}} if labels["Esfuerzo"] else {},
+        "Impacto": {"select":{"name": labels["Impacto"]}} if labels["Impacto"] else {},
+        "Prioridad": {"select":{"name": labels["Prioridad"]}} if labels["Prioridad"] else {},
+        "Tipo Proyecto": {"select":{"name": labels["Tipo Proyecto"]}} if labels["Tipo Proyecto"] else {},
+        "Tipo Trabajo": {"select":{"name": labels["Tipo Trabajo"]}} if labels["Tipo Trabajo"] else {},
     }
+
+    # Limpiar propiedades vacías
     properties = {k:v for k,v in properties.items() if v}
 
+    payload = {"properties": properties}
     if page_id:
         # Actualizar página existente
         url = f"https://api.notion.com/v1/pages/{page_id}"
-        response = requests.patch(url, headers=notion_headers, json={"properties": properties})
-        response.raise_for_status()
-        print(f"Página actualizada: {issue.get('title')}")
+        print(f"Actualizando página: {issue.get('title')}")
+        print(json.dumps(payload, indent=2))
+        response = requests.patch(url, headers=notion_headers, json=payload)
     else:
-        # Crear página nueva
+        # Crear nueva página
+        payload["parent"] = {"database_id": NOTION_DB_ID}
         url = "https://api.notion.com/v1/pages"
-        payload = {"parent": {"database_id": NOTION_DB_ID}, "properties": properties}
+        print(f"Creando página: {issue.get('title')}")
+        print(json.dumps(payload, indent=2))
         response = requests.post(url, headers=notion_headers, json=payload)
-        response.raise_for_status()
-        print(f"Página creada: {issue.get('title')}")
+
+    response.raise_for_status()
+    print(f"Notion status: {response.status_code}")
 
 def main():
     issues = get_linear_issues()
-    print(f"Issues fetched: {len(issues)}")
     for issue in issues:
-        upsert_notion(issue)
+        try:
+            upsert_notion(issue)
+        except Exception as e:
+            print(f"Error al procesar {issue.get('title')}: {e}")
 
 if __name__ == "__main__":
     main()
