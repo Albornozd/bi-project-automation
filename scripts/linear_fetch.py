@@ -8,6 +8,7 @@ query = """
 {
   issues(first: 100) {
     nodes {
+      id
       title
       description
       dueDate
@@ -30,15 +31,17 @@ data = response.json()
 
 issues = []
 
-for i in data["data"]["issues"]["nodes"]:
+for issue in data["data"]["issues"]["nodes"]:
+
     issues.append({
-        "title": i["title"],
-        "description": i["description"],
-        "status": i["state"]["name"],
-        "team": i["team"]["name"] if i["team"] else None,
-        "project": i["project"]["name"] if i["project"] else None,
-        "dueDate": i["dueDate"],
-        "labels": [l["name"] for l in i["labels"]["nodes"]]
+        "id": issue["id"],
+        "title": issue["title"],
+        "description": issue["description"],
+        "status": issue["state"]["name"],
+        "team": issue["team"]["name"] if issue["team"] else None,
+        "project": issue["project"]["name"] if issue["project"] else None,
+        "dueDate": issue["dueDate"],
+        "labels": [l["name"] for l in issue["labels"]["nodes"]]
     })
 
 os.makedirs("data", exist_ok=True)
