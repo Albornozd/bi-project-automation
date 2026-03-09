@@ -1,25 +1,38 @@
-name: Notion to Linear Sync
+name: Sync Linear → Notion BI Initiatives
 
 on:
+
   schedule:
-    - cron: "0 */6 * * *" # Cada 6 horas
+    - cron: "0 */6 * * *"
+
   workflow_dispatch:
 
 jobs:
+
   sync:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install requests
 
-      - name: Notion -> Linear
-        run: python scripts/notion_to_linear.py
+      - name: Fetch Linear Issues
+        run: python scripts/linear_fetch.py
         env:
-          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
+      - name: Push Issues to Notion
+        run: python scripts/push_to_notion.py
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          BI_INITIATIVES_DB: ${{ secrets.BI_INITIATIVES_DB }}
