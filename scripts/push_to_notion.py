@@ -107,10 +107,13 @@ for issue in data["issues"]:
         k: v for k, v in payload["properties"].items() if v is not None
     }
 
-    requests.post(
+    response = requests.post(
         "https://api.notion.com/v1/pages",
         headers=headers,
         json=payload
     )
+
+    print(response.status_code)
+    print(response.text)
 
 print("Issues pushed to Notion")
