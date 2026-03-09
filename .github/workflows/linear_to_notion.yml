@@ -11,7 +11,7 @@ jobs:
 
     steps:
 
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Python
@@ -22,9 +22,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run sync
+      - name: Run Linear → Notion sync
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: python sync_linear_to_notion.py
+        run: python scripts/sync_linear_to_notion.py
