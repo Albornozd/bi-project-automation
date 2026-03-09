@@ -33,7 +33,7 @@ LABEL_MAPPING = {
         "Media": "Media",
         "Baja": "Baja"
     },
-    "Tipo de Proyecto": {
+    "Tipo Proyecto": {
         "Dashboard": "Dashboard",
         "Data model": "Data model",
         "Data Pipeline": "Data Pipeline",
@@ -72,7 +72,7 @@ def sync_issues():
             }
 
             # Mapeo de labels a campos Notion
-            for field in ["Sociedad", "Esfuerzo", "Impacto", "Prioridad", "Tipo de Proyecto", "Tipo de Trabajo"]:
+            for field in ["Sociedad", "Esfuerzo", "Impacto", "Prioridad", "Tipo Proyecto", "Tipo de Trabajo"]:
                 mapped = map_labels(issue_labels, field)
                 if mapped:
                     properties[field] = {"multi_select": [{"name": val} for val in mapped]}
