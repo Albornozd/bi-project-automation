@@ -44,7 +44,7 @@ issues = response.json()["data"]["issues"]["nodes"]
 print("Issues fetched:", len(issues))
 
 # --------------------
-# Map labels to Notion fields
+# Map labels to Notion select fields
 # --------------------
 def map_labels(labels):
     mapping = {
@@ -58,19 +58,19 @@ def map_labels(labels):
     }
     for label in labels:
         name = label["name"]
-        if name.startswith("Departamento"):
+        if name == "Departamento":
             mapping["Departamento"] = name
-        elif name.startswith("Sociedad"):
+        elif name == "Sociedad":
             mapping["Sociedad"] = name
-        elif name.startswith("Esfuerzo"):
+        elif name == "Esfuerzo Estimado":
             mapping["Esfuerzo"] = name
-        elif name.startswith("Impacto"):
+        elif name == "Impacto en Negocio":
             mapping["Impacto"] = name
-        elif name.startswith("Prioridad"):
+        elif name == "Prioridad":
             mapping["Prioridad"] = name
-        elif name.startswith("Tipo de Proyecto"):
+        elif name == "Tipo de Proyecto":
             mapping["Tipo de Proyecto"] = name
-        elif name.startswith("Tipo de Trabajo"):
+        elif name == "Tipo de Trabajo":
             mapping["Tipo de Trabajo"] = name
     return mapping
 
@@ -85,22 +85,23 @@ headers_notion = {
 
 for issue in issues:
     labels_map = map_labels(issue.get("labels", {}).get("nodes", []))
+    assignee_name = issue.get("assignee")["name"] if issue.get("assignee") else ""
 
     properties = {
         "Nombre": {"title": [{"text": {"content": issue["title"]}}]},
         "Team": {"rich_text": [{"text": {"content": issue.get("team", {}).get("name", "")}}]},
         "Proyecto": {"rich_text": [{"text": {"content": issue.get("project", {}).get("name", "")}}]},
-        "Estado": {"rich_text": [{"text": {"content": issue.get("state", {}).get("name", "")}}]},
-        "Departamento": {"rich_text": [{"text": {"content": labels_map["Departamento"]}}]},
-        "Sociedad": {"rich_text": [{"text": {"content": labels_map["Sociedad"]}}]},
-        "Prioridad": {"rich_text": [{"text": {"content": labels_map["Prioridad"]}}]},
-        "Impacto": {"rich_text": [{"text": {"content": labels_map["Impacto"]}}]},
-        "Esfuerzo": {"rich_text": [{"text": {"content": labels_map["Esfuerzo"]}}]},
-        "Tipo de Trabajo": {"rich_text": [{"text": {"content": labels_map["Tipo de Trabajo"]}}]},
-        "Tipo de Proyecto": {"rich_text": [{"text": {"content": labels_map["Tipo de Proyecto"]}}]},
+        "Estado": {"status": {"name": issue.get("state", {}).get("name", "Backlog")}},
+        "Departamento": {"select": {"name": labels_map["Departamento"] or "No asignado"}},
+        "Sociedad": {"select": {"name": labels_map["Sociedad"] or "No asignado"}},
+        "Prioridad": {"select": {"name": labels_map["Prioridad"] or "Normal"}},
+        "Impacto": {"select": {"name": labels_map["Impacto"] or "Medio"}},
+        "Esfuerzo": {"select": {"name": labels_map["Esfuerzo"] or "Medio"}},
+        "Tipo de Trabajo": {"select": {"name": labels_map["Tipo de Trabajo"] or "Tarea"}},
+        "Tipo de Proyecto": {"select": {"name": labels_map["Tipo de Proyecto"] or "Proyecto"}},
         "Due Date": {"date": {"start": issue.get("dueDate")}} if issue.get("dueDate") else None,
-        "Owner": {"rich_text": [{"text": {"content": issue.get("assignee", {}).get("name", "")}}]},
-        "Descripción": {"rich_text": [{"text": {"content": issue.get("description") or ""}}]},
+        "Owner": {"rich_text": [{"text": {"content": assignee_name}}]},
+        "Resumen Ejecutivo": {"rich_text": [{"text": {"content": issue.get("description") or ""}}]},
     }
 
     # Remove None values to avoid errors
