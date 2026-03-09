@@ -24,9 +24,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run sync
+      - name: Run Linear → Notion sync
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          BI_INITIATIVES_DB: ${{ secrets.BI_INITIATIVES_DB }}
         run: python scripts/sync_linear_to_notion.py
