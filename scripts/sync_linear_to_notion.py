@@ -3,7 +3,7 @@ import requests
 
 LINEAR_API_KEY = os.environ["LINEAR_API_KEY"]
 NOTION_API_KEY = os.environ["NOTION_API_KEY"]
-NOTION_DATABASE_ID = os.environ["NOTION_DATABASE_ID"]
+NOTION_DATABASE_ID = os.environ["BI_INITIATIVES_DB"]
 
 LINEAR_URL = "https://api.linear.app/graphql"
 NOTION_URL = "https://api.notion.com/v1/pages"
