@@ -3,7 +3,7 @@ name: Linear → Notion Sync
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 0,12 * * *"
 
 jobs:
   sync:
