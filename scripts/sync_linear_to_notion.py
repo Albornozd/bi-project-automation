@@ -114,7 +114,7 @@ def build_payload(issue):
         "Estado": {"status": {"name": estado}},
         "Proyecto": {"select": {"name": proyecto or "None"}},
         "Team": {"select": {"name": team or "None"}},
-        "Departamento": {"multi_select": [{"name": "Departamento"}]},
+        "Departamento": {"multi_select": [{"name": map_label_to_field(labels, "Departamento")}]},
         "Linear ID": {"rich_text": [{"text": {"content": linear_id}}]},
         "Sociedad": {"select": {"name": map_label_to_field(labels, "Sociedad")}},
         "Prioridad": {"select": {"name": map_label_to_field(labels, "Prioridad")}},
