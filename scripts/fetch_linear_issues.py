@@ -14,6 +14,7 @@ query = """
       id
       title
       description
+      createdAt
       state { name }
       assignee { name }
       dueDate
@@ -38,7 +39,7 @@ if response.status_code == 200:
     print(f"Issues fetched: {len(issues)}")
     
     # Guardar los issues en un archivo JSON para usarlo en push_to_notion.py
-    with open("issues.json", "w") as f:
+    with open("issues.json", "w", encoding="utf-8") as f:
         json.dump(issues, f, indent=2, ensure_ascii=False)
 else:
     print("Error fetching Linear issues:", response.status_code, response.text)
