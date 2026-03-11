@@ -40,6 +40,7 @@ def validate_env():
     }.items():
         if not value:
             raise Exception(f"Missing environment variable: {key}")
+
     print("Environment variables validated")
 
 
@@ -64,7 +65,12 @@ def get_linear_issues():
     }
     """
 
-    resp = requests.post(LINEAR_URL, headers=LINEAR_HEADERS, json={"query": query})
+    resp = requests.post(
+        LINEAR_URL,
+        headers=LINEAR_HEADERS,
+        json={"query": query}
+    )
+
     resp.raise_for_status()
 
     return resp.json()["data"]["issues"]["nodes"]
@@ -104,7 +110,12 @@ def find_notion_page_by_linear_id(linear_id):
         }
     }
 
-    response = requests.post(NOTION_QUERY_URL, headers=NOTION_HEADERS, json=payload)
+    response = requests.post(
+        NOTION_QUERY_URL,
+        headers=NOTION_HEADERS,
+        json=payload
+    )
+
     response.raise_for_status()
 
     results = response.json().get("results")
@@ -126,6 +137,7 @@ def build_payload(issue):
     due_date = issue.get("dueDate") or None
     descripcion = issue.get("description") or ""
     labels = issue.get("labels", {}).get("nodes", [])
+
     created_at = format_date_safe(issue.get("createdAt"))
 
     properties = {
@@ -143,7 +155,7 @@ def build_payload(issue):
         "Esfuerzo": {"select": {"name": map_label_to_field(labels, "Esfuerzo")}},
         "Tipo de Trabajo": {"select": {"name": map_label_to_field(labels, "Tipo de Trabajo")}},
         "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}},
-        "Fecha Creación": {"date": {"start": created_at}} if created_at else {"date": None}
+        "Fecha de Creacion": {"date": {"start": created_at}} if created_at else {"date": None}
     }
 
     if due_date:
@@ -157,7 +169,11 @@ def build_payload(issue):
 
 def create_notion_page(payload, title):
 
-    response = requests.post(NOTION_URL, headers=NOTION_HEADERS, json=payload)
+    response = requests.post(
+        NOTION_URL,
+        headers=NOTION_HEADERS,
+        json=payload
+    )
 
     if response.status_code != 200:
         print("Error creando tarea en Notion:")
