@@ -54,6 +54,7 @@ def get_linear_issues():
           title
           description
           createdAt
+          completedAt
           state { name }
           team { name }
           project { name }
@@ -139,6 +140,7 @@ def build_payload(issue):
     labels = issue.get("labels", {}).get("nodes", [])
 
     created_at = format_date_safe(issue.get("createdAt"))
+    completed_at = format_date_safe(issue.get("completedAt"))
 
     properties = {
         "Nombre": {"title": [{"text": {"content": title}}]},
@@ -155,7 +157,8 @@ def build_payload(issue):
         "Esfuerzo": {"select": {"name": map_label_to_field(labels, "Esfuerzo")}},
         "Tipo de Trabajo": {"select": {"name": map_label_to_field(labels, "Tipo de Trabajo")}},
         "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}},
-        "Fecha de Creacion": {"date": {"start": created_at}} if created_at else {"date": None}
+        "Fecha de Creacion": {"date": {"start": created_at}} if created_at else {"date": None},
+        "Fecha de Culminacion": {"date": {"start": completed_at}} if completed_at else {"date": None}
     }
 
     if due_date:
