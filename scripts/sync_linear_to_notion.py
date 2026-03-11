@@ -1,5 +1,6 @@
 import os
 import requests
+from datetime import datetime
 
 LINEAR_API_KEY = os.environ.get("LINEAR_API_KEY")
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
@@ -43,6 +44,7 @@ def validate_env():
 
 
 def get_linear_issues():
+
     query = """
     {
       issues(first: 50) {
@@ -50,6 +52,7 @@ def get_linear_issues():
           id
           title
           description
+          createdAt
           state { name }
           team { name }
           project { name }
@@ -60,17 +63,34 @@ def get_linear_issues():
       }
     }
     """
+
     resp = requests.post(LINEAR_URL, headers=LINEAR_HEADERS, json={"query": query})
     resp.raise_for_status()
+
     return resp.json()["data"]["issues"]["nodes"]
 
 
 def map_label_to_field(label_nodes, field_name):
+
     for label in label_nodes:
         name = label.get("name")
+
         if name in LABEL_MAPPING.get(field_name, []):
             return name
+
     return "None"
+
+
+def format_date_safe(date_str):
+
+    if not date_str:
+        return None
+
+    try:
+        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        return dt.strftime("%Y-%m-%d")
+    except:
+        return None
 
 
 def find_notion_page_by_linear_id(linear_id):
@@ -106,6 +126,7 @@ def build_payload(issue):
     due_date = issue.get("dueDate") or None
     descripcion = issue.get("description") or ""
     labels = issue.get("labels", {}).get("nodes", [])
+    created_at = format_date_safe(issue.get("createdAt"))
 
     properties = {
         "Nombre": {"title": [{"text": {"content": title}}]},
@@ -121,7 +142,8 @@ def build_payload(issue):
         "Impacto": {"select": {"name": map_label_to_field(labels, "Impacto")}},
         "Esfuerzo": {"select": {"name": map_label_to_field(labels, "Esfuerzo")}},
         "Tipo de Trabajo": {"select": {"name": map_label_to_field(labels, "Tipo de Trabajo")}},
-        "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}}
+        "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}},
+        "Fecha Creación": {"date": {"start": created_at}} if created_at else {"date": None}
     }
 
     if due_date:
