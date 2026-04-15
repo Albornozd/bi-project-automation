@@ -72,7 +72,7 @@ def validate_env():
     print("✅ Variables de entorno OK")
 
 # ==============================
-# GET LABEL IDS
+# GET LABEL IDS FROM LINEAR
 # ==============================
 def get_linear_labels():
     query = """
@@ -87,7 +87,6 @@ def get_linear_labels():
     """
 
     res = requests.post(LINEAR_URL, headers=LINEAR_HEADERS, json={"query": query})
-
     data = res.json()["data"]["issueLabels"]["nodes"]
 
     return {l["name"]: l["id"] for l in data}
@@ -181,12 +180,10 @@ def create_linear_issue(task, label_map):
 # ==============================
 def update_notion_page(page_id, linear_issue):
 
-    linear_id = linear_issue["id"]
     linear_identifier = linear_issue["identifier"]
 
     payload = {
         "properties": {
-            "Planificar": {"checkbox": False},
             "Issue Creado": {"checkbox": True},
             "Linear ID": {
                 "rich_text": [
@@ -230,6 +227,12 @@ def main():
             # 🚫 evitar duplicados
             if props.get("Issue Creado", {}).get("checkbox"):
                 print("⏭️ Ya creado → skip")
+                skipped += 1
+                continue
+
+            existing_linear_id = get_text(props.get("Linear ID", {}))
+            if existing_linear_id:
+                print("⏭️ Ya tiene Linear ID → skip")
                 skipped += 1
                 continue
 
