@@ -27,7 +27,6 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           REQUESTS_BI: ${{ secrets.REQUESTS_BI }}
 
-          # 👇 TUS SECRETS
           LINEAR_TEAM_JOYERIASUAREZ: ${{ secrets.LINEAR_TEAM_JOYERIASUAREZ }}
           LINEAR_BIREQUESTS_GRUPOSUAREZ: ${{ secrets.LINEAR_BIREQUESTS_GRUPOSUAREZ }}
 
