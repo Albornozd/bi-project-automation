@@ -1,8 +1,8 @@
 name: Notion → Linear Sync (Requests BI)
 
 on:
-  schedule:
-    - cron: "*/10 * * * *"  # cada 10 minutos
+  #schedule:
+  #  - cron: "*/10 * * * *"  # cada 10 minutos
   workflow_dispatch:
 
 jobs:
