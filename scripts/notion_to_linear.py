@@ -11,6 +11,9 @@ LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
 LINEAR_TEAM_ID = os.getenv("LINEAR_TEAM_JOYERIASUAREZ")
 LINEAR_PROJECT_ID = os.getenv("LINEAR_BIREQUESTS_GRUPOSUAREZ")
 
+# 👉 TU WORKSPACE
+LINEAR_WORKSPACE = "joyeriasuarez"
+
 # ==============================
 # URLS
 # ==============================
@@ -72,7 +75,7 @@ def validate_env():
     print("✅ Variables de entorno OK")
 
 # ==============================
-# GET LABEL IDS FROM LINEAR
+# GET LABEL IDS
 # ==============================
 def get_linear_labels():
     query = """
@@ -180,15 +183,21 @@ def create_linear_issue(task, label_map):
 # ==============================
 def update_notion_page(page_id, linear_issue):
 
-    linear_identifier = linear_issue["identifier"]
+    identifier = linear_issue["identifier"]
+
+    # 🔥 URL del issue
+    linear_url = f"https://linear.app/{LINEAR_WORKSPACE}/issue/{identifier}"
 
     payload = {
         "properties": {
             "Issue Creado": {"checkbox": True},
             "Linear ID": {
                 "rich_text": [
-                    {"text": {"content": linear_identifier}}
+                    {"text": {"content": identifier}}
                 ]
+            },
+            "Issue Linear": {   # 👈 NUEVO CAMPO URL
+                "url": linear_url
             }
         }
     }
@@ -224,7 +233,6 @@ def main():
         try:
             props = task["properties"]
 
-            # 🚫 evitar duplicados
             if props.get("Issue Creado", {}).get("checkbox"):
                 print("⏭️ Ya creado → skip")
                 skipped += 1
