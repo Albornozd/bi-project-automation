@@ -1,4 +1,4 @@
-name: Notion → Linear Sync (Requests BI)
+name: Notion → Linear Sync
 
 on:
   schedule:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup Python
@@ -21,14 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run Notion → Linear sync
+      - name: Run sync
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           REQUESTS_BI: ${{ secrets.REQUESTS_BI }}
-
-          # 🔥 ESTO FALTABA
-          LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
-          LINEAR_PROJECT_ID: ${{ secrets.LINEAR_PROJECT_ID }}
-
         run: python scripts/notion_to_linear.py
