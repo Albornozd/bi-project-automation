@@ -5,7 +5,7 @@ import requests
 # ENV VARIABLES
 # ==============================
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-NOTION_DB_ID = os.getenv("REQUESTS_BI")  # 👈 AJUSTADO
+NOTION_DB_ID = os.getenv("REQUESTS_BI")
 LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
 
 LINEAR_TEAM_ID = os.getenv("LINEAR_TEAM_ID")
@@ -60,15 +60,20 @@ def get_tasks_to_plan():
 
     payload = {
         "filter": {
-            "and": [
-                {"property": "Planificar", "checkbox": {"equals": True}},
-                {"property": "Issue Creado", "checkbox": {"equals": False}}
-            ]
+            "property": "Planificar",
+            "checkbox": {
+                "equals": True
+            }
         }
     }
 
     response = requests.post(NOTION_QUERY_URL, headers=NOTION_HEADERS, json=payload)
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        print("❌ ERROR NOTION QUERY")
+        print(response.status_code)
+        print(response.text)
+        raise Exception("Error querying Notion")
 
     return response.json().get("results", [])
 
@@ -81,6 +86,8 @@ def create_linear_issue(task):
 
     title = get_title(props["Título"])
     description = get_text(props["Notas de Implementación"])
+
+    print(f"📝 Creando issue: {title}")
 
     labels = []
     for field in [
@@ -125,7 +132,10 @@ def create_linear_issue(task):
         json={"query": query, "variables": variables}
     )
 
-    response.raise_for_status()
+    if response.status_code != 200:
+        print("❌ ERROR CREANDO ISSUE EN LINEAR")
+        print(response.text)
+        raise Exception("Error Linear")
 
     return response.json()["data"]["issueCreate"]["issue"]
 
@@ -147,16 +157,33 @@ def update_notion_page(page_id, linear_id):
     url = f"{NOTION_PAGE_URL}/{page_id}"
 
     response = requests.patch(url, headers=NOTION_HEADERS, json=payload)
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        print("❌ ERROR ACTUALIZANDO NOTION")
+        print(response.text)
+        raise Exception("Error updating Notion")
 
 # ==============================
 # MAIN
 # ==============================
 def main():
 
-    tasks = get_tasks_to_plan()
+    print("🔄 Iniciando sync Notion → Linear")
 
-    print(f"Tareas encontradas para planificar: {len(tasks)}")
+    tasks_raw = get_tasks_to_plan()
+
+    print(f"📥 Tareas con Planificar=True: {len(tasks_raw)}")
+
+    tasks = []
+
+    # Filtrado en Python (evita error 400 de Notion)
+    for task in tasks_raw:
+        issue_creado = task["properties"].get("Issue Creado", {}).get("checkbox")
+
+        if not issue_creado:
+            tasks.append(task)
+
+    print(f"🚀 Tareas a crear en Linear: {len(tasks)}")
 
     for task in tasks:
 
@@ -167,14 +194,16 @@ def main():
 
         # 🚫 Evitar duplicados
         if existing_linear_id:
-            print("Ya existe en Linear → skip")
+            print("⚠️ Ya existe en Linear → skip")
             continue
 
         issue = create_linear_issue(task)
 
-        print(f"Issue creado: {issue['identifier']}")
+        print(f"✅ Issue creado: {issue['identifier']}")
 
         update_notion_page(page_id, issue["id"])
+
+    print("✅ Sync completado")
 
 
 if __name__ == "__main__":
