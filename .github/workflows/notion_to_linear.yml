@@ -21,11 +21,14 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run sync
+      - name: Run Notion → Linear sync
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           REQUESTS_BI: ${{ secrets.REQUESTS_BI }}
-          LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
-          LINEAR_PROJECT_ID: ${{ secrets.LINEAR_PROJECT_ID }}
+
+          # 👇 TUS SECRETS
+          LINEAR_TEAM_JOYERIASUAREZ: ${{ secrets.LINEAR_TEAM_JOYERIASUAREZ }}
+          LINEAR_BIREQUESTS_GRUPOSUAREZ: ${{ secrets.LINEAR_BIREQUESTS_GRUPOSUAREZ }}
+
         run: python scripts/notion_to_linear.py
