@@ -8,14 +8,13 @@ NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_DB_ID = os.getenv("REQUESTS_BI")
 LINEAR_API_KEY = os.getenv("LINEAR_API_KEY")
 
-TEAM_NAME = "JoyeriaSuarez"
-PROJECT_NAME = "BI Requests - Grupo Suarez"
+LINEAR_TEAM_ID = os.getenv("LINEAR_TEAM_ID")
+LINEAR_PROJECT_ID = os.getenv("LINEAR_PROJECT_ID")
 
 # =========================
 # URLS
 # =========================
 NOTION_QUERY_URL = f"https://api.notion.com/v1/databases/{NOTION_DB_ID}/query"
-NOTION_PAGE_URL = "https://api.notion.com/v1/pages"
 LINEAR_URL = "https://api.linear.app/graphql"
 
 # =========================
@@ -33,61 +32,7 @@ LINEAR_HEADERS = {
 }
 
 # =========================
-# LINEAR HELPERS
-# =========================
-def graphql(query, variables=None):
-    response = requests.post(
-        LINEAR_URL,
-        headers=LINEAR_HEADERS,
-        json={"query": query, "variables": variables or {}}
-    )
-    response.raise_for_status()
-    data = response.json()
-
-    if "errors" in data:
-        raise Exception(data["errors"])
-
-    return data["data"]
-
-
-def get_team_id():
-    query = """
-    {
-      teams {
-        nodes {
-          id
-          name
-        }
-      }
-    }
-    """
-    data = graphql(query)
-    for t in data["teams"]["nodes"]:
-        if t["name"] == TEAM_NAME:
-            return t["id"]
-    raise Exception("Team not found")
-
-
-def get_project_id():
-    query = """
-    {
-      projects {
-        nodes {
-          id
-          name
-        }
-      }
-    }
-    """
-    data = graphql(query)
-    for p in data["projects"]["nodes"]:
-        if p["name"] == PROJECT_NAME:
-            return p["id"]
-    raise Exception("Project not found")
-
-
-# =========================
-# NOTION HELPERS
+# HELPERS
 # =========================
 def get_title(prop):
     try:
@@ -107,17 +52,38 @@ def get_select(prop):
     except:
         return None
 
-def get_checkbox(prop):
-    try:
-        return prop["checkbox"]
-    except:
-        return False
+# =========================
+# LINEAR: GET LABELS
+# =========================
+def get_linear_labels():
+    query = """
+    {
+      issueLabels {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+    """
 
+    res = requests.post(
+        LINEAR_URL,
+        headers=LINEAR_HEADERS,
+        json={"query": query}
+    )
+
+    res.raise_for_status()
+
+    labels = res.json()["data"]["issueLabels"]["nodes"]
+
+    return {l["name"]: l["id"] for l in labels}
 
 # =========================
 # NOTION QUERY
 # =========================
-def get_tasks():
+def get_tasks_to_plan():
+
     payload = {
         "filter": {
             "property": "Planificar",
@@ -125,22 +91,29 @@ def get_tasks():
         }
     }
 
-    r = requests.post(NOTION_QUERY_URL, headers=NOTION_HEADERS, json=payload)
-    r.raise_for_status()
-    return r.json()["results"]
+    res = requests.post(
+        NOTION_QUERY_URL,
+        headers=NOTION_HEADERS,
+        json=payload
+    )
 
+    if res.status_code != 200:
+        print("❌ ERROR NOTION")
+        print(res.text)
+        raise Exception("Notion query failed")
+
+    return res.json().get("results", [])
 
 # =========================
 # CREATE LINEAR ISSUE
 # =========================
-def create_issue(task, team_id, project_id):
+def create_linear_issue(task, label_map):
 
     props = task["properties"]
 
-    title = get_title(props["Título"])
-    description = get_text(props["Notas de Implementación"])
+    title = get_title(props.get("Título"))
+    description = get_text(props.get("Notas de Implementación"))
 
-    labels = []
     label_fields = [
         "Departamento",
         "Sociedad",
@@ -149,13 +122,15 @@ def create_issue(task, team_id, project_id):
         "Esfuerzo Estimado"
     ]
 
-    for f in label_fields:
-        val = get_select(props.get(f, {}))
-        if val:
-            labels.append(val)
+    label_ids = []
 
-    mutation = """
-    mutation IssueCreate($input: IssueCreateInput!) {
+    for field in label_fields:
+        val = get_select(props.get(field))
+        if val and val in label_map:
+            label_ids.append(label_map[val])
+
+    query = """
+    mutation ($input: IssueCreateInput!) {
       issueCreate(input: $input) {
         issue {
           id
@@ -169,47 +144,44 @@ def create_issue(task, team_id, project_id):
         "input": {
             "title": title,
             "description": description,
-            "teamId": team_id,
-            "projectId": project_id,
-            "labelNames": labels
+            "teamId": LINEAR_TEAM_ID,
+            "projectId": LINEAR_PROJECT_ID,
+            "labelIds": label_ids
         }
     }
 
-    r = requests.post(
+    res = requests.post(
         LINEAR_URL,
         headers=LINEAR_HEADERS,
-        json={"query": mutation, "variables": variables}
+        json={"query": query, "variables": variables}
     )
 
-    data = r.json()
+    data = res.json()
 
-    if "errors" in data:
-        raise Exception(data["errors"])
+    if res.status_code != 200 or "errors" in data:
+        print("❌ Linear error:", data.get("errors", data))
+        return None
 
     return data["data"]["issueCreate"]["issue"]
-
 
 # =========================
 # UPDATE NOTION
 # =========================
-def update_notion(page_id, issue_id):
+def update_notion(task_id, page_id, linear_id):
+
+    url = f"https://api.notion.com/v1/pages/{page_id}"
 
     payload = {
         "properties": {
             "Planificar": {"checkbox": False},
             "Issue Creado": {"checkbox": True},
             "Linear ID": {
-                "rich_text": [{"text": {"content": issue_id}}]
+                "rich_text": [{"text": {"content": linear_id}}]
             }
         }
     }
 
-    r = requests.patch(f"{NOTION_PAGE_URL}/{page_id}",
-                       headers=NOTION_HEADERS,
-                       json=payload)
-
-    r.raise_for_status()
-
+    requests.patch(url, headers=NOTION_HEADERS, json=payload)
 
 # =========================
 # MAIN
@@ -218,10 +190,9 @@ def main():
 
     print("🔄 Sync Notion → Linear iniciado")
 
-    team_id = get_team_id()
-    project_id = get_project_id()
+    label_map = get_linear_labels()
 
-    tasks = get_tasks()
+    tasks = get_tasks_to_plan()
 
     print(f"📥 Tasks found: {len(tasks)}")
 
@@ -230,26 +201,27 @@ def main():
 
     for task in tasks:
 
+        page_id = task["id"]
         props = task["properties"]
 
-        if get_checkbox(props.get("Issue Creado", {})):
+        # evitar duplicados
+        if props.get("Issue Creado", {}).get("checkbox"):
             skipped += 1
             continue
 
-        try:
-            issue = create_issue(task, team_id, project_id)
-            update_notion(task["id"], issue["id"])
-            created += 1
+        issue = create_linear_issue(task, label_map)
+
+        if issue:
+            update_notion(page_id, page_id, issue["id"])
             print(f"✅ Created: {issue['identifier']}")
-
-        except Exception as e:
-            print(f"❌ Error en task {task['id']}: {e}")
+            created += 1
+        else:
+            skipped += 1
 
     print("================================")
-    print(f"✅ Created: {created}")
-    print(f"⏭️ Skipped: {skipped}")
+    print(f"Created: {created}")
+    print(f"Skipped: {skipped}")
     print("================================")
-
 
 if __name__ == "__main__":
     main()
