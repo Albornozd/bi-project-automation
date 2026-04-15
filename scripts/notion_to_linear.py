@@ -57,8 +57,6 @@ def get_select(prop):
 # VALIDATE ENV
 # ==============================
 def validate_env():
-    print("🔍 Validando variables de entorno...")
-
     required = {
         "NOTION_API_KEY": NOTION_API_KEY,
         "REQUESTS_BI": NOTION_DB_ID,
@@ -71,13 +69,12 @@ def validate_env():
         if not v:
             raise Exception(f"❌ Missing env var: {k}")
 
-    print("✅ Variables OK")
+    print("✅ Variables de entorno OK")
 
 # ==============================
-# GET LABEL IDS FROM LINEAR
+# GET LABEL IDS
 # ==============================
 def get_linear_labels():
-
     query = """
     {
       issueLabels {
@@ -90,9 +87,6 @@ def get_linear_labels():
     """
 
     res = requests.post(LINEAR_URL, headers=LINEAR_HEADERS, json={"query": query})
-
-    if res.status_code != 200:
-        raise Exception("Error fetching labels")
 
     data = res.json()["data"]["issueLabels"]["nodes"]
 
@@ -119,7 +113,7 @@ def get_tasks_to_plan():
     return res.json().get("results", [])
 
 # ==============================
-# CREATE ISSUE
+# CREATE ISSUE IN LINEAR
 # ==============================
 def create_linear_issue(task, label_map):
 
@@ -185,14 +179,19 @@ def create_linear_issue(task, label_map):
 # ==============================
 # UPDATE NOTION
 # ==============================
-def update_notion_page(page_id, linear_id):
+def update_notion_page(page_id, linear_issue):
+
+    linear_id = linear_issue["id"]
+    linear_identifier = linear_issue["identifier"]
 
     payload = {
         "properties": {
             "Planificar": {"checkbox": False},
             "Issue Creado": {"checkbox": True},
             "Linear ID": {
-                "rich_text": [{"text": {"content": linear_id}}]
+                "rich_text": [
+                    {"text": {"content": linear_identifier}}
+                ]
             }
         }
     }
@@ -202,6 +201,7 @@ def update_notion_page(page_id, linear_id):
     res = requests.patch(url, headers=NOTION_HEADERS, json=payload)
 
     if res.status_code != 200:
+        print("❌ Error actualizando Notion:")
         print(res.text)
         raise Exception("Error updating Notion")
 
@@ -227,8 +227,9 @@ def main():
         try:
             props = task["properties"]
 
-            # evitar duplicados
+            # 🚫 evitar duplicados
             if props.get("Issue Creado", {}).get("checkbox"):
+                print("⏭️ Ya creado → skip")
                 skipped += 1
                 continue
 
@@ -237,7 +238,7 @@ def main():
             issue = create_linear_issue(task, label_map)
 
             if issue:
-                update_notion_page(page_id, issue["id"])
+                update_notion_page(page_id, issue)
                 print(f"✅ Created: {issue['identifier']}")
                 created += 1
             else:
@@ -245,6 +246,7 @@ def main():
 
         except Exception as e:
             print(f"❌ Error en task {task['id']}: {e}")
+            skipped += 1
 
     print("================================")
     print(f"Created: {created}")
