@@ -27,7 +27,7 @@ LABEL_MAPPING = {
     "Esfuerzo": ["XL", "L", "M", "S"],
     "Impacto": ["Alto", "Medio", "Bajo"],
     "Prioridad": ["Alta", "Media", "Baja"],
-    "Tipo de Proyecto": ["Dashboard", "Data model", "Data Pipeline", "Analysis"],
+    "Modelo de Datos": ["Modelo Produccion", "Modelo Contable - Suarez", "Modelo Contable - Aristocrazy", "Modelo Transaccional - Suarez", "Modelo Transaccional - Aristocrazy", "Modelo Ventas en Real Time"],
     "Tipo de Trabajo": ["Funcionalidad (Feature)", "Mejora (Improvement)", "Cambio (Change)"]
 }
 
@@ -155,7 +155,7 @@ def build_payload(issue):
         "Prioridad": {"select": {"name": map_label_to_field(labels, "Prioridad")}},
         "Impacto": {"select": {"name": map_label_to_field(labels, "Impacto")}},
         "Esfuerzo": {"select": {"name": map_label_to_field(labels, "Esfuerzo")}},
-        "Tipo de Trabajo": {"select": {"name": map_label_to_field(labels, "Tipo de Trabajo")}},
+        "Modelo de Datos": {"select": {"name": map_label_to_field(labels, "Modelo de Datos")}},
         "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}},
         "Fecha de Creacion": {"date": {"start": created_at}} if created_at else {"date": None},
         "Fecha de Culminacion": {"date": {"start": completed_at}} if completed_at else {"date": None}
