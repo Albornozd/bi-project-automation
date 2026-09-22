@@ -27,7 +27,7 @@ LABEL_MAPPING = {
     "Esfuerzo": ["XL", "L", "M", "S"],
     "Impacto": ["Alto", "Medio", "Bajo"],
     "Prioridad": ["Alta", "Media", "Baja"],
-    "Modelo de Datos": ["Modelo Produccion", "Modelo Contable - Suarez", "Modelo Contable - Aristocrazy", "Modelo Transaccional - Suarez", "Modelo Transaccional - Aristocrazy", "Modelo Ventas en Real Time", "Modelo CRM"],
+    "Modelo de Datos": ["None", "Modelo Produccion", "Modelo Contable - Suarez", "Modelo Contable - Aristocrazy", "Modelo Transaccional - Suarez", "Modelo Transaccional - Aristocrazy", "Modelo Ventas en Real Time", "Modelo CRM"],
     "Tipo de Trabajo": ["Funcionalidad (Feature)", "Mejora (Improvement)", "Cambio (Change)"]
 }
 
