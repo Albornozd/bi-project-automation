@@ -3,31 +3,59 @@ name: Notion → Linear Sync (Requests BI)
 on:
   schedule:
     - cron: "*/10 * * * *"
+
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
+
   sync:
+
     runs-on: ubuntu-latest
 
     steps:
+
+      # ------------------------------------------------------
+      # Checkout
+      # ------------------------------------------------------
+
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      # ------------------------------------------------------
+      # Python
+      # ------------------------------------------------------
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
+
+      # ------------------------------------------------------
+      # Dependencies
+      # ------------------------------------------------------
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      # ------------------------------------------------------
+      # Sync
+      # ------------------------------------------------------
 
       - name: Run Notion → Linear sync
         env:
+
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
           REQUESTS_BI: ${{ secrets.REQUESTS_BI }}
 
-          LINEAR_TEAM_JOYERIASUAREZ: ${{ secrets.LINEAR_TEAM_JOYERIASUAREZ }}
-          LINEAR_BIREQUESTS_GRUPOSUAREZ: ${{ secrets.LINEAR_BIREQUESTS_GRUPOSUAREZ }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 
-        run: python scripts/notion_to_linear.py
+          LINEAR_TEAM_JOYERIASUAREZ: ${{ secrets.LINEAR_TEAM_JOYERIASUAREZ }}
+
+        run: |
+          python scripts/notion_to_linear.py
