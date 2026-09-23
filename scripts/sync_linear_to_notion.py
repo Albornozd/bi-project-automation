@@ -156,7 +156,7 @@ def build_payload(issue):
         "Impacto": {"select": {"name": map_label_to_field(labels, "Impacto")}},
         "Esfuerzo": {"select": {"name": map_label_to_field(labels, "Esfuerzo")}},
         "Modelo de Datos": {"select": {"name": map_label_to_field(labels, "Modelo de Datos")}},
-        "Tipo de Proyecto": {"select": {"name": map_label_to_field(labels, "Tipo de Proyecto")}},
+        "Tipo de Trabajo": {"select": {"name": map_label_to_field(labels, "Tipo de Trabajo")}},
         "Fecha de Creacion": {"date": {"start": created_at}} if created_at else {"date": None},
         "Fecha de Culminacion": {"date": {"start": completed_at}} if completed_at else {"date": None}
     }
